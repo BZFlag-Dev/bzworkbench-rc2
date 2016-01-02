@@ -20,7 +20,7 @@ class View;
 #include "BZEventHandler.h"
 
 #include <osgViewer/Viewer>
-#include <osgGA/MatrixManipulator>
+#include <osgGA/CameraManipulator>
 
 #include <osg/NodeVisitor>
 #include <osg/Matrix>
@@ -33,7 +33,7 @@ class selectHandler : public BZEventHandler {
 public:
 
 	// constructor
-	selectHandler( View* view, osgGA::MatrixManipulator* baseManipulator );
+	selectHandler( View* view, osgGA::CameraManipulator* baseManipulator );
 	~selectHandler() {}
 
 	// get the name
@@ -86,7 +86,7 @@ private:
     unsigned int prevEvent;
 
     // the base camera manipulator (needed for extracting camera orientation)
-    osgGA::MatrixManipulator* cameraManipulator;
+    osgGA::CameraManipulator* cameraManipulator;
 
 	// variables for snapping
 	osg::Vec3 translateSnap;

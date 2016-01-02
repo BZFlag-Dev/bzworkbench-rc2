@@ -82,7 +82,7 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
    osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
 
    // make sure that the center of the trackball doesn't move if we zoom in too close
-   cameraManipulator->setMinimumZoomScale( 0.0 );
+   // TODO FS cameraManipulator->setMinimumZoomScale( 0.0 );
 
    this->setCameraManipulator(cameraManipulator);
    this->cameraManipulatorRef = cameraManipulator;

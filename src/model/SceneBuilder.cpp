@@ -11,7 +11,7 @@
  */
 
 #include <curl/curl.h>
-#include <curl/types.h>
+// TODO FS #include <curl/types.h>
 #include <curl/easy.h>
 
 #ifdef _WIN32

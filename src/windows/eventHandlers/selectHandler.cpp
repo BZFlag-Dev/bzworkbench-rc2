@@ -15,7 +15,7 @@
 #include "windows/View.h"
 #include "windows/MainWindow.h"
 
-selectHandler::selectHandler( View* _view, osgGA::MatrixManipulator* manipulator ) : BZEventHandler( _view ) {
+selectHandler::selectHandler( View* _view, osgGA::CameraManipulator* manipulator ) : BZEventHandler( _view ) {
 	lastSelected = NULL;
 	lastSelectedData = NULL;
 	dx = dy = prev_x = prev_y = 0.0;

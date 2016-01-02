@@ -437,7 +437,7 @@ osg::Group* Primitives::buildUntexturedBox( osg::Vec3 size ) {
 	// add vertex indices for each side
 	for ( int i = 0; i < 6; i++ ) {
 		sideGeometry[i]->setVertexAttribBinding( 0, osg::Geometry::BIND_PER_VERTEX );
-		sideGeometry[i]->setNormalIndices(normalIndexArray);
+		// TODO FS sideGeometry[i]->setNormalIndices(normalIndexArray);
 		sideGeometry[i]->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 		sideGeometry[i]->addPrimitiveSet( side );
 	}
