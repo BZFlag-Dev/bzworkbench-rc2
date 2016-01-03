@@ -53,7 +53,7 @@ class BZEventHandler;
 class MainWindow;
 
 // an extension of RenderWindow and osgViewer (this will be added to the main window), and Observer
-class View : public osgViewer::Viewer, public RenderWindow //, public Observer
+class View : public osgViewer::Viewer, public RenderWindow, public Observer
 {
     public:
 

@@ -97,7 +97,6 @@ MainWindow::MainWindow() : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench
 {
     printf("MainWindow::MainWindow()\n");
     this->end();
-
     this->model = new Model();
     this->view  = new View(model, this, RENDER_WINDOW_X, RENDER_WINDOW_Y, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT);
     this->view->end();
@@ -110,12 +109,20 @@ MainWindow::MainWindow() : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench
 MainWindow::MainWindow(Model* m) : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench") {
     this->end();
     this->model = m;
-    printf("MainWindow: model addr: %p\n", this->getModel());
+
     this->view = new View(this->model, this, RENDER_WINDOW_X, RENDER_WINDOW_Y, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT);
     this->view->end();
     this->add(view);
-    printf("MainWindow addr: %p\n", this );
+
+    // Add all the GUI Elements.
+    this->menuBar = new MenuBar( this );
+    this->add(menuBar);
+
+    // Mark as finished
     initialized = true;
+
+    this->model->addObserver( view );
+
     this->resizable(NULL);
 }
 

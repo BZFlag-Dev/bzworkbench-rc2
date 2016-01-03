@@ -89,40 +89,39 @@
 
 #include <osgDB/ReadFile>
 
-#if 0
 // register the built-in objects
 void buildModelDatabase() {
-	Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
-	Model::registerObject("base", NULL, "end", base::init, BaseConfigurationDialog::init);
-	Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
-	Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
-	Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
-	Model::registerObject("group", NULL, "end", group::init, GroupConfigurationDialog::init);
-	Model::registerObject("link", NULL, "end", Tlink::init);
-	Model::registerObject("material", NULL, "end", material::init);
-	Model::registerObject("mesh", "<mesh:<face><drawinfo>><drawinfo:<lod>><lod:<matref>>", "end", mesh::init);
-	// need to do this for faces
-	Model::addTerminatorSupport("face", "endface");
+    Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
+    Model::registerObject("base", NULL, "end", base::init, BaseConfigurationDialog::init);
+    Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
+    Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
+    Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
+    Model::registerObject("group", NULL, "end", group::init, GroupConfigurationDialog::init);
+    Model::registerObject("link", NULL, "end", Tlink::init);
+    Model::registerObject("material", NULL, "end", material::init);
+    Model::registerObject("mesh", "<mesh:<face><drawinfo>><drawinfo:<lod>><lod:<matref>>", "end", mesh::init);
+    // need to do this for faces
+    Model::addTerminatorSupport("face", "endface");
 
-	Model::registerObject("meshbox", NULL, "end", box::init, BoxConfigurationDialog::init);
-	Model::registerObject("meshpyr", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
-	Model::registerObject("options", NULL, "end", options::init);
-	Model::registerObject("physics", NULL, "end", physics::init);
-	Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
-	Model::registerObject("sphere", NULL, "end", sphere::init, SphereConfigurationDialog::init);
-	Model::registerObject("teleporter", NULL, "end", teleporter::init, TeleporterConfigurationDialog::init);
-	Model::registerObject("tetra", NULL, "end", tetra::init);
-	Model::registerObject("texturematrix", NULL, "end", texturematrix::init);
-	Model::registerObject("waterLevel", NULL, "end", waterLevel::init);
-	Model::registerObject("weapon", NULL, "end", weapon::init, WeaponConfigurationDialog::init);
-	Model::registerObject("world", NULL, "end", world::init);
-	Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
-	Model::registerObject("info", NULL, "end", info::init);
+    Model::registerObject("meshbox", NULL, "end", box::init, BoxConfigurationDialog::init);
+    Model::registerObject("meshpyr", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
+    Model::registerObject("options", NULL, "end", options::init);
+    Model::registerObject("physics", NULL, "end", physics::init);
+    Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
+    Model::registerObject("sphere", NULL, "end", sphere::init, SphereConfigurationDialog::init);
+    Model::registerObject("teleporter", NULL, "end", teleporter::init, TeleporterConfigurationDialog::init);
+    Model::registerObject("tetra", NULL, "end", tetra::init);
+    Model::registerObject("texturematrix", NULL, "end", texturematrix::init);
+    Model::registerObject("waterLevel", NULL, "end", waterLevel::init);
+    Model::registerObject("weapon", NULL, "end", weapon::init, WeaponConfigurationDialog::init);
+    Model::registerObject("world", NULL, "end", world::init);
+    Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
+    Model::registerObject("info", NULL, "end", info::init);
 
-	Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
+    Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
 }
-#endif
 
+// Whenever nothing is happing, this will be called.
 void idle_callback()
 {
     Fl::redraw();
@@ -130,20 +129,17 @@ void idle_callback()
 
 
 int main(int argc, char** argv) {
-
     // init the model
-    Model* model = 0; // new Model();
+    Model* model = new Model();
 
     // add supported objects
-    // buildModelDatabase();
+    buildModelDatabase();
 
     // initialize the BZWParser
-    // BZWParser::init( model );
+    BZWParser::init( model );
 
     // init the SceneBuilder
-    // SceneBuilder::init();
-
-    // printf("model addr: %p\n", (void *)model);
+    SceneBuilder::init();
 
     // load the main window
     MainWindow* mw = new MainWindow(model);

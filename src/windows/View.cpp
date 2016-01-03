@@ -9,7 +9,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <osgDB/ReadFile>
 
 #include "windows/View.h"
 #include "dialogs/MenuBar.h"
@@ -20,20 +19,36 @@ const double View::DEFAULT_ZOOM = 75.0;
 // view constructor
 View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char *_label) : RenderWindow(_x,_y,_w,_h) {
 
+    this->model = m;
+    this->root  = new osg::Group();
+    // initialize the ground
+    this->ground = new Ground( 400.0f );
+
+    // add the ground to the root node
+    this->root->addChild( ground );
+
+    // build the scene from the model
+    Model::objRefList objects = model->getObjects();
+    if(objects.size() > 0) {
+        for(Model::objRefList::iterator _i = objects.begin(); 
+            _i != objects.end(); _i++) {
+            root->addChild( _i->get() );
+        }
+    }
+
     // set OSG viewport
     this->getCamera()->setViewport(new osg::Viewport(0,0,_w,_h));
-    this->getCamera()->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
+    this->getCamera()->setProjectionMatrixAsPerspective(
+            30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
     this->getCamera()->setGraphicsContext(getGraphicsWindow());
     this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // add the root node to the scene
-    osg::ref_ptr<osg::Node> loadedModel = osgDB::readNodeFile("../Sandbox/SimpleView/OpenSceneGraph-Data/cessna.osg");
-    this->setSceneData( loadedModel.get() );
+    this->setSceneData(root);
 
     // give the View a trackball manipulator
     osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
     this->setCameraManipulator(cameraManipulator);
-    this->model = m;
     this->addEventHandler(new osgViewer::StatsHandler);
 
     // assign the parent reference
@@ -44,11 +59,8 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 // build the mouse button map
 void View::buildMouseButtonMap() {
     mouseButtonMap = map< unsigned int, unsigned int > ();
-
     // default mapppings
-
     mouseButtonMap[ FL_MIDDLE_MOUSE ] = FL_LEFT_MOUSE;		// middle mouse drags in FLTK should translate to left mouse drags in OSG
-
 }
 
 // destructor
@@ -89,9 +101,8 @@ int View::handle(int event) {
 
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
-#if 0
     // refresh the selection
-    selection->update( obs, data );
+    // FS selection->update( obs, data );
 
     // process data
     if( data != NULL ) {
@@ -148,7 +159,6 @@ void View::update( Observable* obs, void* data ) {
                 break;
         }
     }
-#endif
     // refresh the scene
     redraw();
 }
