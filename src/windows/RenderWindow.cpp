@@ -46,22 +46,40 @@ void RenderWindow::resize(int x, int y, int w, int h) {
     Fl_Gl_Window::resize(x,y,w,h);
 }
 
+
+// The osg trackball uses the following conventions to move a scene:
+// Mouse button 1 down plus move -> rotate
+// Mouse button 2 down plus move -> translate
+// Mouse button 3 down plus move -> scale
+//
+// We need those buttons for other stuff however, so instead
+// we do the following translation:
+//   Mouse button 1  -> Mouse button 1
+//   Mouse button 1 + control -> Mouse button 2
+//   Mouse button 1 + alt -> Mouse button 3
+//
 // event handler
 int RenderWindow::handle(int event) {
     int result = 1;
-    printf("    >>RenderWindow::handle(int event)\n");
+    //printf("    >>RenderWindow::handle(int event)\n");
     // forward FLTK events to OSG
-    printf("  mouse button %d\n", Fl::event_button());
+    int button = 1;
+    int state = Fl::event_state();
+    if (state & FL_CTRL) {
+        button = 2;
+    } else if (state & FL_ALT) {
+        button = 3;
+    }
     switch(event){
         case FL_PUSH:
-            _gw->getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+            _gw->getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), button);
             break;
         case FL_MOVE:
         case FL_DRAG:
             _gw->getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
             break;
         case FL_RELEASE:
-            _gw->getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), Fl::event_button() );
+            _gw->getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), button);
             break;
         case FL_KEYDOWN:
             _gw->getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
@@ -73,8 +91,7 @@ int RenderWindow::handle(int event) {
             // pass other events to the base class
             result = Fl_Gl_Window::handle(event);
     }
-
-    printf("    <<RenderWindow::handle(int event)\n");
+    //printf("    <<RenderWindow::handle(int event)\n");
     return result;
 }
 

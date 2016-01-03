@@ -127,8 +127,9 @@ MainWindow::MainWindow(Model* m) : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZW
 }
 
 MainWindow::~MainWindow() {
-    if(model)
+    if(model) {
         delete model;
+    }
     initialized = false;
 }
 
