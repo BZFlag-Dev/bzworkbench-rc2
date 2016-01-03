@@ -8,9 +8,15 @@ modern versions of Linux.
 It was initaly written for the google summer of code program.
 
 
-In it current state it:
+In its current state it:
 
 - compiles under Arch Linux
 - Can load and view maps
 
 
+You can rotate the map by using the pressing the left mouse
+button and moving the mouse on the screen. Using mouse+ctrl or
+mouse+alt, you can shift or scale the map.
+
+
+![Screenshot](bzworkbenchscreenshot.png "Screenshot")
