@@ -121,10 +121,20 @@ void buildModelDatabase() {
     Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
 }
 
+
+
+MainWindow* mw = 0;
+
 // Whenever nothing is happing, this will be called.
 void idle_callback()
 {
-    Fl::redraw();
+    if (mw != 0) {
+        // Only redraw the View, not all GUI elements.
+        // It will flicker a lot otherwise.
+        mw->getView()->redraw();
+    } else {
+        // DO Nothing
+    }
 }
 
 
@@ -136,27 +146,31 @@ int main(int argc, char** argv) {
     buildModelDatabase();
 
     // initialize the BZWParser
-    BZWParser::init( model );
+    BZWParser::init(model);
 
     // init the SceneBuilder
     SceneBuilder::init();
 
     // load the main window
-    MainWindow* mw = new MainWindow(model);
+    mw = new MainWindow(model);
     mw->resizable(mw);
+
+    printf("MainWindow: %p\n", mw);
+    printf("View: %p\n", mw->getView());
 
     // show the main window
     mw->show();
 
-    // load any plugins
-//    the_mainWindow = mw;
-//    initPlugins();
+    // TODO load any plugins
+    //    the_mainWindow = mw;
+    //    initPlugins();
 
-    // load a default model
-//    bool success = BZWParser::loadFile( "./share/material_test.bzw" );
+    // TODO load a default model
+    //    bool success = BZWParser::loadFile( "./share/material_test.bzw" );
     // run the program
 
     Fl::set_idle(idle_callback);
 
     return Fl::run();
 }
+

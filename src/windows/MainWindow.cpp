@@ -135,7 +135,7 @@ MainWindow::~MainWindow() {
 // handle
 int MainWindow::handle(int event) {
     int result = 1;
-    printf(">>MainWindow::handle(int event)\n");
+//    printf(">>MainWindow::handle(int event)\n");
     switch( event ) {
         // catch right-click pushes--the user should double-click to access the menu
         case FL_PUSH:
@@ -157,7 +157,7 @@ int MainWindow::handle(int event) {
         default:
             result = Fl_Window::handle( event );
     }
-    printf("<<MainWindow::handle(int event)\n");
+//    printf("<<MainWindow::handle(int event)\n");
     return result;
 }
 

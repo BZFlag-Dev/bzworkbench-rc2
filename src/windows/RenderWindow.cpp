@@ -51,6 +51,7 @@ int RenderWindow::handle(int event) {
     int result = 1;
     printf("    >>RenderWindow::handle(int event)\n");
     // forward FLTK events to OSG
+    printf("  mouse button %d\n", Fl::event_button());
     switch(event){
         case FL_PUSH:
             _gw->getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), Fl::event_button() );

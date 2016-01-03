@@ -14,6 +14,7 @@
 #include "dialogs/MenuBar.h"
 #include "objects/waterLevel.h"
 
+// TODO does this do anything?
 const double View::DEFAULT_ZOOM = 75.0;
 
 // view constructor
@@ -22,7 +23,7 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
     this->model = m;
     this->root  = new osg::Group();
     // initialize the ground
-    this->ground = new Ground( 400.0f );
+    this->ground = new Ground(400.0f);
 
     // add the ground to the root node
     this->root->addChild( ground );
@@ -48,6 +49,7 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 
     // give the View a trackball manipulator
     osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
+    this->cameraManipulatorRef = cameraManipulator;
     this->setCameraManipulator(cameraManipulator);
     this->addEventHandler(new osgViewer::StatsHandler);
 
@@ -60,15 +62,16 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 void View::buildMouseButtonMap() {
     mouseButtonMap = map< unsigned int, unsigned int > ();
     // default mapppings
-    mouseButtonMap[ FL_MIDDLE_MOUSE ] = FL_LEFT_MOUSE;		// middle mouse drags in FLTK should translate to left mouse drags in OSG
+    // middle mouse drags in FLTK should translate to left mouse drags in OSG
+    mouseButtonMap[ FL_MIDDLE_MOUSE ] = FL_LEFT_MOUSE;
 }
 
 // destructor
 View::~View() {
-    if(eventHandlers)
+    if(eventHandlers) {
         delete eventHandlers;
+    }
 }
-
 
 // draw method (really simple)
 void View::draw(void) {
@@ -76,15 +79,16 @@ void View::draw(void) {
 }
 
 // scale the selection based on the distance from the camera to the center to ensure it stays the same size
-void View::updateSelection( float newDistance ) {
-//    this->selection->setScale( osg::Vec3( 0.01 * newDistance, 0.01 * newDistance, 0.01 * newDistance ) );
+void View::updateSelection(float newDistance) {
+    this->selection->setScale( 
+            osg::Vec3(0.01 * newDistance, 0.01 * newDistance, 0.01 * newDistance));
 }
 
 void View::updateSelection() {
-//    // get the distance from the eyepoint to the center of the trackball
-//    float dist = this->cameraManipulatorRef->getDistance();
-//    this->updateSelection( dist );
-//    // refresh
+    // get the distance from the eyepoint to the center of the trackball
+    float dist = this->cameraManipulatorRef->getDistance();
+    this->updateSelection( dist );
+    // refresh
     redraw();
 }
 
@@ -93,16 +97,16 @@ int View::handle(int event) {
     int result = 1;
     unsigned int e_x = Fl::event_x();
     unsigned int e_y = Fl::event_y();
-    printf("  >>View::handle(int event)\n");
+//    printf("  >>View::handle(int event)\n");
     result = RenderWindow::handle(event);
-    printf("  <<View::handle(int event)\n");
+//    printf("  <<View::handle(int event)\n");
     return result;
 }
 
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
     // refresh the selection
-    // FS selection->update( obs, data );
+    // FS selection->update(obs, data);
 
     // process data
     if( data != NULL ) {
@@ -117,10 +121,10 @@ void View::update( Observable* obs, void* data ) {
                     bz2object* obj = (bz2object*)(obs_msg->data);
 
                     if( getRootNode()->getNumChildren() > 0 )
-                        getRootNode()->insertChild( 1, obj );	// insert the child directly after the Ground object
+                        // insert the child directly after the Ground object
+                        getRootNode()->insertChild( 1, obj );
                     else
                         getRootNode()->addChild( obj );
-
 
                     break;
                 }
@@ -164,25 +168,26 @@ void View::update( Observable* obs, void* data ) {
 }
 
 // is a button pressed?
-bool View::isPressed( int value ) {
-	return modifiers[ value ];
+bool View::isPressed(int value) {
+    return modifiers[value];
 }
 
-bool View::isSelected( bz2object* obj ) { return this->model->isSelected( obj ); }
+bool View::isSelected( bz2object* obj ) { 
+    return this->model->isSelected( obj ); 
+}
+
 /**
  * Tell the model to select an object
  */
-void View::setSelected( bz2object* object ) {
-
-	this->model->_setSelected( object );
+void View::setSelected(bz2object* object) {
+    this->model->_setSelected(object);
 }
 
 /**
  * Tell the model to unselect an object
  */
-void View::setUnselected( bz2object* object ) {
-
-	this->model->_setUnselected( object );
+void View::setUnselected(bz2object* object) {
+    this->model->_setUnselected(object);
 }
 
 
@@ -190,7 +195,6 @@ void View::setUnselected( bz2object* object ) {
  * Tell the model to unselect all selected objects
  */
 void View::unselectAll() {
-
-	this->model->_unselectAll();
+    this->model->_unselectAll();
 }
 
