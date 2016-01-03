@@ -9,6 +9,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+#include <osgDB/ReadFile>
 
 #include "windows/View.h"
 #include "dialogs/MenuBar.h"
@@ -17,271 +18,139 @@
 const double View::DEFAULT_ZOOM = 75.0;
 
 // view constructor
-View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char *_label) :
-	RenderWindow(_x,_y,_w,_h) {
+View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char *_label) : RenderWindow(_x,_y,_w,_h) {
 
-	// set OSG viewport
+    // set OSG viewport
     this->getCamera()->setViewport(new osg::Viewport(0,0,_w,_h));
-
-    // get the graphics context
+    this->getCamera()->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
     this->getCamera()->setGraphicsContext(getGraphicsWindow());
+    this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
-    // do single-threaded view
-  this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    // add the root node to the scene
+    osg::ref_ptr<osg::Node> loadedModel = osgDB::readNodeFile("../Sandbox/SimpleView/OpenSceneGraph-Data/cessna.osg");
+    this->setSceneData( loadedModel.get() );
 
-   // set the model
-   this->model = m;
+    // give the View a trackball manipulator
+    osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
+    this->setCameraManipulator(cameraManipulator);
+    this->model = m;
+    this->addEventHandler(new osgViewer::StatsHandler);
 
-   // initialize the root node
-   this->root = new osg::Group();
-
-   // configure the stateset of the root node
-   osg::StateSet* stateSet = root->getOrCreateStateSet();
-
-   // disable OSG's shading by making full white ambient light
-   osg::LightModel* lighting = new osg::LightModel();
-   lighting->setAmbientIntensity( osg::Vec4( 1, 1, 1, 1 ) );
-
-   stateSet->setAttribute( lighting, osg::StateAttribute::OVERRIDE );
-
-   stateSet->setTextureMode( 0, GL_TEXTURE_2D, osg::StateAttribute::ON );
-
-   // initialize the ground
-   this->ground = new Ground( 400.0f );
-
-   // add the ground to the root node
-   this->root->addChild( ground );
-
-	// set the key modifiers to false
-   this->modifiers = map< int, bool >();
-   this->modifiers[ FL_SHIFT ] = false;
-   this->modifiers[ FL_CTRL ] = false;
-   this->modifiers[ FL_ALT ] = false;
-   this->modifiers[ FL_META ] = false;
-
-	// build the scene from the model
-	Model::objRefList objects = model->getObjects();
-	if(objects.size() > 0) {
-		for(Model::objRefList::iterator _i = objects.begin(); _i != objects.end(); _i++) {
-			root->addChild( _i->get() );
-		}
-	}
-
-
-   // make a new selection object
-   this->selection = new Selection( this );
-
-   // add the selection
-   // NOTE: this has to be the LAST child on the list, because it doesn't have Z-bufferring enabled!
-   this->root->addChild( selection );
-
-	// add the root node to the scene
-   this->setSceneData( root );
-
-   // give the View a trackball manipulator
-   osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
-
-   // make sure that the center of the trackball doesn't move if we zoom in too close
-   // TODO FS cameraManipulator->setMinimumZoomScale( 0.0 );
-
-   this->setCameraManipulator(cameraManipulator);
-   this->cameraManipulatorRef = cameraManipulator;
-
-   // make an event handler collection
-   this->eventHandlers = new EventHandlerCollection( this );
-
-   // add the selectHandler
-   selHandler = new selectHandler( this, cameraManipulator );
-   this->eventHandlers->addEventHandler( selectHandler::getName().c_str(), selHandler );
-
-   // add the scene picker event handler
-   this->addEventHandler(eventHandlers);
-
-   // assign the parent reference
-   this->mw = _mw;
-
-   // build the mouse button map
-   this->buildMouseButtonMap();
-
-   // initialize snap to grid variables
-   snappingEnabled = false;
-   scaleSnapSize = 1;
-   translateSnapSize = 1;
-   rotateSnapSize = 15;
+    // assign the parent reference
+    this->mw = _mw;
 }
+
 
 // build the mouse button map
 void View::buildMouseButtonMap() {
-	mouseButtonMap = map< unsigned int, unsigned int > ();
+    mouseButtonMap = map< unsigned int, unsigned int > ();
 
-	// default mapppings
+    // default mapppings
 
-	mouseButtonMap[ FL_MIDDLE_MOUSE ] = FL_LEFT_MOUSE;		// middle mouse drags in FLTK should translate to left mouse drags in OSG
+    mouseButtonMap[ FL_MIDDLE_MOUSE ] = FL_LEFT_MOUSE;		// middle mouse drags in FLTK should translate to left mouse drags in OSG
 
 }
 
 // destructor
 View::~View() {
-	if(eventHandlers)
-		delete eventHandlers;
+    if(eventHandlers)
+        delete eventHandlers;
 }
 
 
 // draw method (really simple)
 void View::draw(void) {
-	frame();
+    frame();
 }
 
 // scale the selection based on the distance from the camera to the center to ensure it stays the same size
 void View::updateSelection( float newDistance ) {
-	this->selection->setScale( osg::Vec3( 0.01 * newDistance, 0.01 * newDistance, 0.01 * newDistance ) );
+//    this->selection->setScale( osg::Vec3( 0.01 * newDistance, 0.01 * newDistance, 0.01 * newDistance ) );
 }
 
 void View::updateSelection() {
-	// get the distance from the eyepoint to the center of the trackball
-    float dist = this->cameraManipulatorRef->getDistance();
-    this->updateSelection( dist );
-    // refresh
+//    // get the distance from the eyepoint to the center of the trackball
+//    float dist = this->cameraManipulatorRef->getDistance();
+//    this->updateSelection( dist );
+//    // refresh
     redraw();
 }
 
 // handle events
 int View::handle(int event) {
-	// whatever the event was, we need to regenerate the modifier keys
-	int shiftState = Fl::event_state();
-	modifiers[ FL_SHIFT ] = (( shiftState & FL_SHIFT ) != 0);
-	modifiers[ FL_CTRL ] = (( shiftState & FL_CTRL ) != 0);
-	modifiers[ FL_META ] = (( shiftState & FL_META ) != 0);
-	modifiers[ FL_ALT ] = (( shiftState & FL_ALT ) != 0);
-
-	e_key = Fl::event_key();
-	e_button = Fl::event_button();
-	unsigned int e_x = Fl::event_x();
-	unsigned int e_y = Fl::event_y();
-	
-	// make Cntrl-Left Mouse Button = Right Mouse Button
-	if( Fl::event_ctrl() && e_button == FL_LEFT_MOUSE){
-		e_button = FL_RIGHT_MOUSE;
-	}
-	// make Alt-Left Mouse Button = Middle Mouse Button
-	if( Fl::event_alt() && e_button == FL_LEFT_MOUSE){
-		e_button = FL_MIDDLE_MOUSE;
-	}
-	//printf("Event (view): event: %d ctrl:%d alt:%d button:%d x:%d y:%d\n", event, Fl::event_ctrl(), Fl::event_alt(), e_button, e_x, e_x );
-
-    // set up the 3D cursor by the key
-    selection->setStateByKey( e_key );
-
-	// forward FLTK events to OSG
-	switch(event){
-        case FL_PUSH:
-        	// handle single mouse clicks
-        	if(Fl::event_clicks() == 0) {
-        		getEventQueue()->mouseButtonPress(e_x, e_y, e_button );
-        	}
-        	// handle double clicks
-            else {
-            	getEventQueue()->mouseDoubleButtonPress(e_x, e_y, e_button );
-            	Fl::event_is_click(0);
-            }
-            redraw();
-            return 1;
-        case FL_DRAG: {
-        	getEventQueue()->mouseMotion(e_x, e_y);
-        	updateSelection();
-			return 1;
-        }
-        case FL_RELEASE:
-            getEventQueue()->mouseButtonRelease(e_x, e_y, e_button );
-        	redraw();
-			return 1;
-        case FL_KEYDOWN:
-        	getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)e_key);
-            redraw();
-            return 1;
-        case FL_KEYUP:
-            getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)e_key);
-			//make backspace act as a delete key, users with non-extended keyboards may not have the standard delete key
-			if(Fl::event_key() == FL_BackSpace){
-				// call menu delete
-				mw->getMenuBar()->delete_callback(mw->getMenuBar(), mw->getMenuBar());
-			}
-			// release mouse on Control key up
-			if(Fl::event_key() == FL_Control_L || Fl::event_key() == FL_Control_R ){
-				getEventQueue()->mouseButtonRelease( e_x, e_y, FL_RIGHT_MOUSE );
-			}
-			// release mouse on Alternate key up
-			if(Fl::event_key() == FL_Alt_L || Fl::event_key() == FL_Alt_R){
-				getEventQueue()->mouseButtonRelease( e_x, e_y, FL_MIDDLE_MOUSE );
-			}
-            redraw();
-            return 1;
-        default:
-            // pass other events to the base class
-            return RenderWindow::handle(event);
-    }
+    int result = 1;
+    unsigned int e_x = Fl::event_x();
+    unsigned int e_y = Fl::event_y();
+    printf("  >>View::handle(int event)\n");
+    result = RenderWindow::handle(event);
+    printf("  <<View::handle(int event)\n");
+    return result;
 }
 
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
+#if 0
+    // refresh the selection
+    selection->update( obs, data );
 
-	// refresh the selection
-	selection->update( obs, data );
+    // process data
+    if( data != NULL ) {
+        // get the message
+        ObserverMessage* obs_msg = (ObserverMessage*)(data);
 
-	// process data
-	if( data != NULL ) {
-		// get the message
-		ObserverMessage* obs_msg = (ObserverMessage*)(data);
+        // process the message
+        switch( obs_msg->type ) {
+            // add an object to the scene
+            case ObserverMessage::ADD_OBJECT : 
+                {
+                    bz2object* obj = (bz2object*)(obs_msg->data);
 
-		// process the message
-		switch( obs_msg->type ) {
-			// add an object to the scene
-			case ObserverMessage::ADD_OBJECT : {
-				bz2object* obj = (bz2object*)(obs_msg->data);
-
-				if( getRootNode()->getNumChildren() > 0 )
-					getRootNode()->insertChild( 1, obj );	// insert the child directly after the Ground object
-				else
-					getRootNode()->addChild( obj );
+                    if( getRootNode()->getNumChildren() > 0 )
+                        getRootNode()->insertChild( 1, obj );	// insert the child directly after the Ground object
+                    else
+                        getRootNode()->addChild( obj );
 
 
-				break;
-			}
-			// remove an object from the scene
-			case ObserverMessage::REMOVE_OBJECT : {
-				bz2object* obj = (bz2object*)(obs_msg->data);
-				getRootNode()->removeChild( obj );
+                    break;
+                }
+                                               // remove an object from the scene
+            case ObserverMessage::REMOVE_OBJECT : 
+                {
+                    bz2object* obj = (bz2object*)(obs_msg->data);
+                    getRootNode()->removeChild( obj );
 
-				break;
-			}
-			// update the world size
-			case ObserverMessage::UPDATE_WORLD : {
-				// in this case, the data will contain a pointer to the modified world object
-				world* bzworld = (world*)(obs_msg->data);
+                    break;
+                }
+                // update the world size
+            case ObserverMessage::UPDATE_WORLD : 
+                {
+                    // in this case, the data will contain a pointer to the modified world object
+                    world* bzworld = (world*)(obs_msg->data);
 
-				root->removeChild( ground );
-				ground = new Ground( bzworld->getSize(), model->getWaterLevelData()->getHeight() );
-				root->insertChild(0, ground);
+                    root->removeChild( ground );
+                    ground = new Ground( bzworld->getSize(), model->getWaterLevelData()->getHeight() );
+                    root->insertChild(0, ground);
 
-				break;
-			}
-			// update an object (i.e. it's selection value changed, etc.)
-			case ObserverMessage::UPDATE_OBJECT : {
-				bz2object* obj = (bz2object*)(obs_msg->data);
-				if( obj->isSelected() )
-					SceneBuilder::markSelectedAndPreserveStateSet( obj );
-				else
-					SceneBuilder::markUnselectedAndRestoreStateSet( obj );
+                    break;
+                }
+                // update an object (i.e. it's selection value changed, etc.)
+            case ObserverMessage::UPDATE_OBJECT : 
+                {
+                    bz2object* obj = (bz2object*)(obs_msg->data);
+                    if( obj->isSelected() )
+                        SceneBuilder::markSelectedAndPreserveStateSet( obj );
+                    else
+                        SceneBuilder::markUnselectedAndRestoreStateSet( obj );
 
-				break;
-			}
-			default:
-				break;
-		}
-	}
-
-	// refresh the scene
-	redraw();
+                    break;
+                }
+            default:
+                break;
+        }
+    }
+#endif
+    // refresh the scene
+    redraw();
 }
 
 // is a button pressed?

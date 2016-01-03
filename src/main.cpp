@@ -87,6 +87,9 @@
 #include <osg/Group>
 
 
+#include <osgDB/ReadFile>
+
+#if 0
 // register the built-in objects
 void buildModelDatabase() {
 	Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
@@ -118,72 +121,46 @@ void buildModelDatabase() {
 
 	Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
 }
+#endif
+
+void idle_callback()
+{
+    Fl::redraw();
+}
+
 
 int main(int argc, char** argv) {
-	
-	#ifdef __APPLE__ 
-	// set current working directory to be the parent directory of the bundled application
-	// only need to do this if built as a bundled application so we check the executable's path
-	size_t pathSize = MAXPATHLEN * 2;
-	char* rPath = (char*)malloc(pathSize);
-	char* execPath = (char*)malloc(pathSize);
-	int err = _NSGetExecutablePath(execPath, (uint32_t*)&pathSize );
-	if (err) {
-		puts("Application Path lookup failed!");
-	}else{
-		realpath(execPath, rPath);
-		printf("Application Path: %s\n", rPath);
-	}
-	
-	//FIXME - do not hard code app & executable names
-	string ibPath = "BzWorkbench.app/Contents/MacOS/BzWorkbench";
-	
-	if(strlen(rPath) > ibPath.length()){
-		string test = string(rPath).substr(string(rPath).length()-ibPath.length(), ibPath.length());
-		if( test.compare(ibPath) == 0 ){
-			// remove "bzworkbench.app/Contents/MacOS/bzworkbench"
-			std::string fixedPath = TextUtils::replace_all( rPath, ibPath, "");
-	
-			// set the current working directory
-			err = chdir((const char *)fixedPath.c_str());
-			// maybe we should bail out here if there is an error
-			if (err) puts("Changing Current Working Directory failed!");
-		}
-	}
-	
-	free(rPath);
-	free(execPath);
-	
-	#endif /* APPLE */
 
-	// init the model
-	Model* model = new Model();
+    // init the model
+    Model* model = 0; // new Model();
 
-	// add supported objects
-	buildModelDatabase();
+    // add supported objects
+    // buildModelDatabase();
 
-	// initialize the BZWParser
-	BZWParser::init( model );
+    // initialize the BZWParser
+    // BZWParser::init( model );
 
-	// init the SceneBuilder
-	SceneBuilder::init();
+    // init the SceneBuilder
+    // SceneBuilder::init();
 
-	printf("model addr: %p\n", (void *)model);
+    // printf("model addr: %p\n", (void *)model);
 
-	// load the main window
-	MainWindow* mw = new MainWindow(model);
-	mw->resizable(mw);
+    // load the main window
+    MainWindow* mw = new MainWindow(model);
+    mw->resizable(mw);
 
-	// show the main window
-	mw->show();
+    // show the main window
+    mw->show();
 
-	// load any plugins
-	the_mainWindow = mw;
-	initPlugins();
-	
-	// load a default model
-	//bool success = BZWParser::loadFile( "./share/material_test.bzw" );
+    // load any plugins
+//    the_mainWindow = mw;
+//    initPlugins();
 
-	// run the program
-	return Fl::run();
+    // load a default model
+//    bool success = BZWParser::loadFile( "./share/material_test.bzw" );
+    // run the program
+
+    Fl::set_idle(idle_callback);
+
+    return Fl::run();
 }
