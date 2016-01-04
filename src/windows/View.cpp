@@ -51,7 +51,15 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
     osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
     this->cameraManipulatorRef = cameraManipulator;
     this->setCameraManipulator(cameraManipulator);
-    this->addEventHandler(new osgViewer::StatsHandler);
+
+
+    this->eventHandlers = new EventHandlerCollection( this );
+    // add the selectHandler
+    selHandler = new selectHandler(this, cameraManipulator);
+    this->eventHandlers->addEventHandler(
+            selectHandler::getName().c_str(), selHandler );
+    // add the scene picker event handler
+    this->addEventHandler(eventHandlers);
 
     // assign the parent reference
     this->mw = _mw;
@@ -95,8 +103,6 @@ void View::updateSelection() {
 // handle events
 int View::handle(int event) {
     int result = 1;
-    unsigned int e_x = Fl::event_x();
-    unsigned int e_y = Fl::event_y();
 //    printf("  >>View::handle(int event)\n");
     result = RenderWindow::handle(event);
 //    printf("  <<View::handle(int event)\n");
@@ -106,7 +112,7 @@ int View::handle(int event) {
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
     // refresh the selection
-    // FS selection->update(obs, data);
+    // TODO selection->update(obs, data);
 
     // process data
     if( data != NULL ) {
@@ -164,7 +170,7 @@ void View::update( Observable* obs, void* data ) {
         }
     }
     // refresh the scene
-    redraw();
+    //    redraw();
 }
 
 // is a button pressed?
