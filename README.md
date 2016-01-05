@@ -20,3 +20,9 @@ mouse+alt, you can shift or scale the map.
 
 
 ![Screenshot](bzworkbenchscreenshot.png "Screenshot")
+
+
+<https://developers.google.com/open-source/gsoc/2007/#bzflag>
+
+<https://www.google-melange.com/gsoc/org2/google/gsoc2009/bzflag>
+

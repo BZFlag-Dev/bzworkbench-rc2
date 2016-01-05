@@ -72,20 +72,24 @@ int RenderWindow::handle(int event) {
     }
     switch(event){
         case FL_PUSH:
-            _gw->getEventQueue()->mouseButtonPress(Fl::event_x(), Fl::event_y(), button);
+            _gw->getEventQueue()->mouseButtonPress(
+                    Fl::event_x(), Fl::event_y(), button);
             break;
         case FL_MOVE:
         case FL_DRAG:
             _gw->getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
             break;
         case FL_RELEASE:
-            _gw->getEventQueue()->mouseButtonRelease(Fl::event_x(), Fl::event_y(), button);
+            _gw->getEventQueue()->mouseButtonRelease(
+                    Fl::event_x(), Fl::event_y(), button);
             break;
         case FL_KEYDOWN:
-            _gw->getEventQueue()->keyPress((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
+            _gw->getEventQueue()->keyPress(
+                    (osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             break;
         case FL_KEYUP:
-            _gw->getEventQueue()->keyRelease((osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
+            _gw->getEventQueue()->keyRelease(
+                    (osgGA::GUIEventAdapter::KeySymbol)Fl::event_key());
             break;
         default:
             // pass other events to the base class

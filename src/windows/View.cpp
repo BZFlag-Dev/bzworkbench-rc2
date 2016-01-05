@@ -21,10 +21,27 @@ const double View::DEFAULT_ZOOM = 75.0;
 View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char *_label) : RenderWindow(_x,_y,_w,_h) {
 
     this->model = m;
+
+    // set OSG viewport
+    this->getCamera()->setViewport(new osg::Viewport(0,0,_w,_h));
+    this->getCamera()->setProjectionMatrixAsPerspective(
+            30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
+    this->getCamera()->setGraphicsContext(getGraphicsWindow());
+    this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+
+
     this->root  = new osg::Group();
+
+    // configure the stateset of the root node
+    osg::StateSet* stateSet = root->getOrCreateStateSet();
+    // disable OSG's shading by making full white ambient light
+    osg::LightModel* lighting = new osg::LightModel();
+    lighting->setAmbientIntensity(osg::Vec4( 1, 1, 1, 1 ));
+    stateSet->setAttribute(lighting, osg::StateAttribute::OVERRIDE);
+    stateSet->setTextureMode(0, GL_TEXTURE_2D, osg::StateAttribute::ON);
+
     // initialize the ground
     this->ground = new Ground(400.0f);
-
     // add the ground to the root node
     this->root->addChild( ground );
 
@@ -37,13 +54,6 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
         }
     }
 
-    // set OSG viewport
-    this->getCamera()->setViewport(new osg::Viewport(0,0,_w,_h));
-    this->getCamera()->setProjectionMatrixAsPerspective(
-            30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
-    this->getCamera()->setGraphicsContext(getGraphicsWindow());
-    this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
-
     // add the root node to the scene
     this->setSceneData(root);
 
@@ -51,7 +61,6 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
     osgGA::TrackballManipulator* cameraManipulator = new osgGA::TrackballManipulator();
     this->cameraManipulatorRef = cameraManipulator;
     this->setCameraManipulator(cameraManipulator);
-
 
     this->eventHandlers = new EventHandlerCollection( this );
     // add the selectHandler
@@ -95,7 +104,7 @@ void View::updateSelection(float newDistance) {
 void View::updateSelection() {
     // get the distance from the eyepoint to the center of the trackball
     float dist = this->cameraManipulatorRef->getDistance();
-    this->updateSelection( dist );
+    this->updateSelection(dist);
     // refresh
     redraw();
 }

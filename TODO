@@ -1,3 +1,13 @@
 Add features.
 Fix bugs.
 Improve the unix build system.
+
+
+Frans:
+    - fix irratic view rotation when an object is selected   
+    - fix core-dump on clicking "translate"
+
+    Ongoing
+    - Document architecture
+    - Write manual
+    - Find bugs
