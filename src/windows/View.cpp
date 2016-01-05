@@ -137,7 +137,7 @@ int View::handle(int event) {
 
     e_key = Fl::event_key();
 
-// TODO Coredumps: FS    selection->setStateByKey( e_key );
+    selection->setStateByKey( e_key );
 
 //    printf("  >>View::handle(int event)\n");
     result = RenderWindow::handle(event);
@@ -148,7 +148,7 @@ int View::handle(int event) {
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
     // refresh the selection
-    // TODO selection->update(obs, data);
+    selection->update(obs, data);
 
     // process data
     if( data != NULL ) {
@@ -207,8 +207,6 @@ void View::update( Observable* obs, void* data ) {
                 break;
         }
     }
-    // refresh the scene
-    //    redraw();
 }
 
 // is a button pressed?
