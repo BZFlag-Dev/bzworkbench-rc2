@@ -54,6 +54,14 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
         }
     }
 
+    // make a new selection object
+    this->selection = new Selection( this );
+
+    // add the selection
+    // NOTE: this has to be the LAST child on the list, 
+    // because it doesn't have Z-bufferring enabled!
+    this->root->addChild( selection );
+
     // add the root node to the scene
     this->setSceneData(root);
 
@@ -72,6 +80,13 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 
     // assign the parent reference
     this->mw = _mw;
+
+    // set the key modifiers to false
+    this->modifiers = map< int, bool >();
+    this->modifiers[ FL_SHIFT ] = false;
+    this->modifiers[ FL_CTRL ] = false;
+    this->modifiers[ FL_ALT ] = false;
+    this->modifiers[ FL_META ] = false;
 }
 
 
@@ -112,6 +127,18 @@ void View::updateSelection() {
 // handle events
 int View::handle(int event) {
     int result = 1;
+    int shiftState = Fl::event_state();
+
+    // whatever the event was, we need to regenerate the modifier keys
+    modifiers[ FL_SHIFT ] = (( shiftState & FL_SHIFT ) != 0);
+    modifiers[ FL_CTRL ] = (( shiftState & FL_CTRL ) != 0);
+    modifiers[ FL_META ] = (( shiftState & FL_META ) != 0);
+    modifiers[ FL_ALT ] = (( shiftState & FL_ALT ) != 0);
+
+    e_key = Fl::event_key();
+
+// TODO Coredumps: FS    selection->setStateByKey( e_key );
+
 //    printf("  >>View::handle(int event)\n");
     result = RenderWindow::handle(event);
 //    printf("  <<View::handle(int event)\n");
@@ -143,7 +170,7 @@ void View::update( Observable* obs, void* data ) {
 
                     break;
                 }
-                                               // remove an object from the scene
+           // remove an object from the scene
             case ObserverMessage::REMOVE_OBJECT : 
                 {
                     bz2object* obj = (bz2object*)(obs_msg->data);
@@ -151,19 +178,21 @@ void View::update( Observable* obs, void* data ) {
 
                     break;
                 }
-                // update the world size
+            // update the world size
             case ObserverMessage::UPDATE_WORLD : 
                 {
-                    // in this case, the data will contain a pointer to the modified world object
+                    // in this case, the data will contain a pointer to 
+                    // the modified world object
                     world* bzworld = (world*)(obs_msg->data);
 
                     root->removeChild( ground );
-                    ground = new Ground( bzworld->getSize(), model->getWaterLevelData()->getHeight() );
+                    ground = new Ground(bzworld->getSize(), 
+                            model->getWaterLevelData()->getHeight() );
                     root->insertChild(0, ground);
 
                     break;
                 }
-                // update an object (i.e. it's selection value changed, etc.)
+            // update an object (i.e. it's selection value changed, etc.)
             case ObserverMessage::UPDATE_OBJECT : 
                 {
                     bz2object* obj = (bz2object*)(obs_msg->data);
