@@ -15,7 +15,7 @@
 #include "windows/View.h"
 #include "windows/MainWindow.h"
 
-selectHandler::selectHandler( View* _view, osgGA::CameraManipulator* manipulator ) : BZEventHandler( _view ) {
+selectHandler::selectHandler(View* _view, osgGA::CameraManipulator* manipulator) : BZEventHandler(_view) {
     lastSelected = NULL;
     lastSelectedData = NULL;
     dx = dy = prev_x = prev_y = 0.0;
@@ -27,20 +27,23 @@ selectHandler::selectHandler( View* _view, osgGA::CameraManipulator* manipulator
 }
 
 // handle an event
-bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa ) {
+bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa) {
     View* viewer;
 
     switch(ea.getEventType())
     {
-
         // catch drag events
         case osgGA::GUIEventAdapter::DRAG :
-
+            printf("sh: drag %f %f\n", 
+                    (float) ea.getXnormalized(), (float) ea.getYnormalized());
             viewer = dynamic_cast<View*>(&aa);
-            if( viewer != NULL ) {
+            if(viewer != NULL) {
                 Renderable* lsobj = (Renderable*)lastSelected;
-                if( lsobj != NULL && lsobj->getName() == Selection_NODE_NAME ) {
-                    // if the last event was a DRAG event, we need to update the dx and dy
+                printf("lsobj %p %s %s\n", lsobj, lsobj->getName().c_str(), Selection_NODE_NAME);
+                if(lsobj != NULL && !(lsobj->getName().compare(Selection_NODE_NAME))) {
+                    printf("Yup yup\n");
+                    // if the last event was a DRAG event, we need to update
+                    // the dx and dy
                     if( prevEvent == osgGA::GUIEventAdapter::DRAG ) {
                         dx = ea.getXnormalized() - prev_x;
                         dy = ea.getYnormalized() - prev_y;
@@ -70,6 +73,8 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
                         default:
                             return dragSelector( view, ea );
                     }
+                } else {
+                    printf("Aauuw\n");
                 }
             }
             return false;
@@ -81,36 +86,53 @@ bool selectHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAd
             return true;
 
             // catch single-click events (see if we picked the selector or an object)
-        case osgGA::GUIEventAdapter::PUSH : {
-                                                int button = ea.getButton();
+        case osgGA::GUIEventAdapter::PUSH :
+            {
+                bool result = false;
 
-                                                if( button == FL_LEFT_MOUSE ) {
-                                                    viewer = dynamic_cast<View*>(&aa);
-                                                    if( viewer ) {
-                                                        prevEvent = osgGA::GUIEventAdapter::PUSH;
-                                                        if ( pickSelector( viewer, ea ) ) {
-                                                            return true;
-                                                        }
-                                                        // only pick an object if a selector couldn't be picked
-                                                        else if ( pickObject( viewer, ea ) ) {
-                                                            return true;
-                                                        }
-                                                    }
-                                                }
-                                                else if( button == FL_RIGHT_MOUSE ) {
-                                                    viewer = dynamic_cast<View*>(&aa);
-                                                    if(viewer) {
-                                                        prevEvent = osgGA::GUIEventAdapter::PUSH;
-                                                        return configureObject(viewer, ea);
+                printf("sh: push\n");
+                int button = ea.getButton();
 
-                                                    }
-                                                }
-                                                return false;
-                                            }
-
+                if(button == FL_LEFT_MOUSE) {
+                    viewer = dynamic_cast<View*>(&aa);
+                    if(viewer) {
+                        prevEvent = osgGA::GUIEventAdapter::PUSH;
+                        if (pickSelector( viewer, ea )) {
+                            result = true;
+                        }
+                        // only pick an object if a selector couldn't be picked
+                        else if (pickObject( viewer, ea)) {
+                            result = false;
+                        } else {
+                            // Picked nothing...
+                        }
+                    } else {
+                        printf("No viewer!\n");
+                    }
+                } else if(button == FL_RIGHT_MOUSE) {
+                    viewer = dynamic_cast<View*>(&aa);
+                    if(viewer) {
+                        prevEvent = osgGA::GUIEventAdapter::PUSH;
+                        result = configureObject(viewer, ea);
+                    } else {
+                        printf("No viewer!\n");
+                    }
+                } else {
+                    // Nothing
+                }
+                printf("sh: push result %d\n", result);
+                return result;
+            }
+        case osgGA::GUIEventAdapter::FRAME :
+            // Generated every time a frame is drawn
+            printf("osgGA::GUIEventAdapter::FRAME\n");
+            return true;
+        case osgGA::GUIEventAdapter::RESIZE :
+            printf("osgGA::GUIEventAdapter::RESIZE\n");
+            return true;
         default:
-                                            // assume we handled everything
-                                            return true;
+            // assume we handled everything
+            return true;
     }
 }
 

@@ -48,40 +48,41 @@ using namespace std;
  * a call to makeCurrentHandler will make it so events are forwarded to ONLY that handler.
  * Calling makeCurrentHandler(NULL) will undo that.
  */
-class EventHandlerCollection : public osgGA::GUIEventHandler {
-public: 
 
-    EventHandlerCollection( const View* _view ) { this->view = _view; currentEventHandler = NULL; }
-    ~EventHandlerCollection() {}
-    
-    // handle an event
-    bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa);
-    
-    // add an event handler
-    bool addEventHandler( const char* _name, BZEventHandler* eventHandler );
-    
-    // remove an event handler
-    bool removeEventHandler( const char* _name );
-	
-	// get an event handler
-	osg::ref_ptr< BZEventHandler > getEventHandler( const char* name );
-	
-	// set an event handler
-	osg::ref_ptr< BZEventHandler > setEventHandler( const char* name, BZEventHandler* handler );
-	
-	// make an event handler current
-	// pass NULL to allow events to pass to all handlers
-	void makeCurrentHandler( const char* _name );
-   	
-private:
-	// the view we're attached to
-	const View* view;
-	
-	// the current event handler
-	BZEventHandler* currentEventHandler;
-	
-	// map of event handlers
-	map< string, osg::ref_ptr<BZEventHandler> > eventHandlers;
+class EventHandlerCollection : public osgGA::GUIEventHandler {
+    public: 
+
+        EventHandlerCollection( const View* _view ) { this->view = _view; currentEventHandler = NULL; }
+        ~EventHandlerCollection() {}
+
+        // handle an event
+        bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa);
+
+        // add an event handler
+        bool addEventHandler( const char* _name, BZEventHandler* eventHandler );
+
+        // remove an event handler
+        bool removeEventHandler( const char* _name );
+
+        // get an event handler
+        osg::ref_ptr< BZEventHandler > getEventHandler( const char* name );
+
+        // set an event handler
+        osg::ref_ptr< BZEventHandler > setEventHandler( const char* name, BZEventHandler* handler );
+
+        // make an event handler current
+        // pass NULL to allow events to pass to all handlers
+        void makeCurrentHandler( const char* _name );
+
+    private:
+        // the view we're attached to
+        const View* view;
+
+        // the current event handler
+        BZEventHandler* currentEventHandler;
+
+        // map of event handlers
+        map< string, osg::ref_ptr<BZEventHandler> > eventHandlers;
 };
 
 #include "View.h"

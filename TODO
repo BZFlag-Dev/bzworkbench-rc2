@@ -1,13 +1,13 @@
-Add features.
-Fix bugs.
-Improve the unix build system.
 
+Bugs:
+    - irratic view rotation when an object is selected   
+    - Crash on loading 
 
-Frans:
-    - fix irratic view rotation when an object is selected   
-    - fix core-dump on clicking "translate"
+Documentation:
+    - User Manual
+    - Design/Architecture
 
-    Ongoing
-    - Document architecture
-    - Write manual
-    - Find bugs
+Features
+    - Undo
+    - Improve the unix build system.
+

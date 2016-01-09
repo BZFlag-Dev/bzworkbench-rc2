@@ -127,7 +127,9 @@ MainWindow::MainWindow() : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench
     printf("MainWindow::MainWindow()\n");
     this->end();
     this->model = new Model();
-    this->view  = new View(model, this, RENDER_WINDOW_X, RENDER_WINDOW_Y, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT);
+    this->view  = new View(model, this, 
+            RENDER_WINDOW_X, RENDER_WINDOW_Y, 
+            RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT);
     this->view->end();
     this->add(view);
     initialized = true;

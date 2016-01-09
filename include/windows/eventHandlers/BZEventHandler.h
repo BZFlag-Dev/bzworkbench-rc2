@@ -22,23 +22,24 @@
 
 class View;
 
-// This is the interface all event handlers that can be incorporated EventHandlerCollection
-// must conform to.  These handlers are meant to be used in conjunction with a scene manipulator.
+// This is the interface all event handlers that can be incorporated
+// EventHandlerCollection must conform to.  These handlers are meant to be
+// used in conjunction with a scene manipulator.
 
 class BZEventHandler : public osgGA::GUIEventHandler {
 
-public:
+    public:
+        BZEventHandler( View* _view ) { this->view = _view; }
+        ~BZEventHandler() {}
 
-	BZEventHandler( View* _view ) { this->view = _view; }
-	~BZEventHandler() {}
+        // the handler
+        virtual bool handle(
+                const osgGA::GUIEventAdapter& ea, 
+                osgGA::GUIActionAdapter& aa ) = 0;
 
-	// the handler
-	virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa ) = 0;
-
-protected:
-
-	// the View we're attached to
-	View* view;
+    protected:
+        // the View we're attached to
+        View* view;
 };
 
 #endif /*BZEVENTHANDLER_H_*/

@@ -43,8 +43,9 @@ osg::ref_ptr< BZEventHandler > EventHandlerCollection::setEventHandler( const ch
     osg::ref_ptr< BZEventHandler > prevHandler = NULL;
     string _name = string(_n);
 
-    if( eventHandlers.count( _name ) > 0 )	
+    if( eventHandlers.count( _name ) > 0 ) {
         prevHandler = eventHandlers[ _name ];
+    }
 
     eventHandlers[_name] = osg::ref_ptr< BZEventHandler >( eventHandler );
 
@@ -65,22 +66,31 @@ void EventHandlerCollection::makeCurrentHandler( const char* _n )  {
 }
 
 // handle all incoming events
-bool EventHandlerCollection::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa ) {
+bool EventHandlerCollection::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa) {
     // if we have a designated event handler, then pass it on
     if( currentEventHandler != NULL ) {
-        return currentEventHandler->handle( ea, aa );	
+        return currentEventHandler->handle( ea, aa );
     }
     // otherwise, pass the data on to ALL event handlers
     else if( eventHandlers.size() > 0 ) {
         bool handled = false;
         for( map< string, osg::ref_ptr< BZEventHandler > >::iterator i = eventHandlers.begin(); i != eventHandlers.end() && !handled; i++) {
-            handled = i->second->handle( ea, aa );
+            printf("EventHandlerCollection::handle()\n");
+            handled = i->second->handle(ea, aa);
+        }
+        if (handled) {
+            printf("handled\n");
+        } else {
+            printf("NOT!! handled\n");
         }
         return handled;
-    }
-    else
+    } else {
         return false;
+    }
 }
+
+
+
 
 /*
 // the event handler (takes events from OSG GuiAdapters)

@@ -30,68 +30,69 @@ class View;
 
 class selectHandler : public BZEventHandler {
 
-public:
+    public:
 
-	// constructor
-	selectHandler( View* view, osgGA::CameraManipulator* baseManipulator );
-	~selectHandler() {}
+        // constructor
+        selectHandler(View* view, osgGA::CameraManipulator* baseManipulator);
+        ~selectHandler() {}
 
-	// get the name
-	static std::string getName() { return std::string("selectHandler"); }
+        // get the name
+        static std::string getName() { return std::string("selectHandler"); }
 
-	// handle an event
-	bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
+        // handle an event
+        bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
 
-	// pick out a Renderable
-    bool pickObject(View* viewer, const osgGA::GUIEventAdapter& ea);
+        // pick out a Renderable
+        bool pickObject(View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // pick the selector
-    bool pickSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // pick the selector
+        bool pickSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // configure an object
-    bool configureObject( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // configure an object
+        bool configureObject( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // drag the selector
-    bool dragSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // drag the selector
+        bool dragSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // rotate (i.e. spin) the selector (i.e. if the appropriate key is pressed)
-    bool rotateSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // rotate (i.e. spin) the selector (i.e. if the appropriate key is pressed)
+        bool rotateSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // scale the selector (i.e. if the appropriate key is pressed)
-    bool scaleSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // scale the selector (i.e. if the appropriate key is pressed)
+        bool scaleSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // shear the selector (i.e. if the appropriate key is pressed)
-    bool shearSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // shear the selector (i.e. if the appropriate key is pressed)
+        bool shearSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-    // shift the selector (i.e. if the appropriate key is pressed)
-    bool shiftSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
+        // shift the selector (i.e. if the appropriate key is pressed)
+        bool shiftSelector( View* viewer, const osgGA::GUIEventAdapter& ea);
 
-	// sets the lastSelected variable to NULL (should be called if an bz2object is deleted)
-	void clearLastSelected();
+        // sets the lastSelected variable to NULL (should be called if an
+        // bz2object is deleted)
+        void clearLastSelected();
 
-private:
-    // the last Renderable to be selected
-    Renderable* lastSelected;
+    private:
+        // the last Renderable to be selected
+        Renderable* lastSelected;
 
-    // data associated with the last renderable
-    void* lastSelectedData;
+        // data associated with the last renderable
+        void* lastSelectedData;
 
-    // difference in x and y in mouse position (normalized)
-    double dx, dy;
+        // difference in x and y in mouse position (normalized)
+        double dx, dy;
 
-    // previous x and y values
-    double prev_x, prev_y;
+        // previous x and y values
+        double prev_x, prev_y;
 
-    // previous event type
-    unsigned int prevEvent;
+        // previous event type
+        unsigned int prevEvent;
 
-    // the base camera manipulator (needed for extracting camera orientation)
-    osgGA::CameraManipulator* cameraManipulator;
+        // the base camera manipulator (needed for extracting camera orientation)
+        osgGA::CameraManipulator* cameraManipulator;
 
-	// variables for snapping
-	osg::Vec3 translateSnap;
-	osg::Vec3 scaleSnap;
-	float rotateSnap;
+        // variables for snapping
+        osg::Vec3 translateSnap;
+        osg::Vec3 scaleSnap;
+        float rotateSnap;
 };
 
 #endif /*SELECTHANDLER_H_*/

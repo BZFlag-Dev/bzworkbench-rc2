@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef __APPLE__ 
 #include <sys/param.h>
@@ -126,7 +127,7 @@ void buildModelDatabase() {
 MainWindow* mw = 0;
 
 // Whenever nothing is happing, this will be called.
-void idle_callback()
+void idle_callback(void*)
 {
     if (mw != 0) {
         // Only redraw the View, not all GUI elements.
@@ -135,6 +136,7 @@ void idle_callback()
     } else {
         // DO Nothing
     }
+    Fl::repeat_timeout(0.5, idle_callback);
 }
 
 
@@ -169,8 +171,7 @@ int main(int argc, char** argv) {
     //    bool success = BZWParser::loadFile( "./share/material_test.bzw" );
     // run the program
 
-    Fl::set_idle(idle_callback);
-
+    Fl::add_timeout(0.1, idle_callback);
     return Fl::run();
 }
 

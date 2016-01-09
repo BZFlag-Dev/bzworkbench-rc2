@@ -22,6 +22,7 @@ const float Selection::TIP_RADIUS = 1.0f;
 
 
 Selection::Selection(View* view, SelectionState state) {
+    printf("Selection::Selection\n");
     this->view = view;
 
     state = state;
@@ -43,11 +44,12 @@ Selection::Selection(View* view, SelectionState state) {
     addChild( objectAxisGroup.get() );
 
     // assign the selector geode based on state
-    switch( state ) {
-        case TRANSLATE:
-            selectionNode = axes;
-            break;
-        case ROTATE:
+    switch(state) {
+
+       case TRANSLATE:
+          selectionNode = axes;
+         break;
+       case ROTATE:
             selectionNode = rotator;
             break;
         case SCALE:
@@ -59,8 +61,8 @@ Selection::Selection(View* view, SelectionState state) {
             break;
     }
 
-    setName( Selection_NODE_NAME );
-
+    setName(Selection_NODE_NAME);
+    printf("===>> %s\n", getName().c_str());
 }
 
 // build the axes geode
@@ -346,7 +348,7 @@ osg::ref_ptr< Renderable > Selection::buildScaler( osg::Vec3 localOrigin ) {
             0.5f,
             yGeode );
 
-    // z axis is blue			  
+    // z axis is blue
     SceneBuilder::assignMaterial( osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
             osg::Vec4f( 0.0, 0.0, 0.0, 0.5 ),
             osg::Vec4f( 0.0, 0.0, 1.0, 0.5 ),
@@ -621,38 +623,38 @@ osg::Node* Selection::getPickedNode( Renderable* r, const osg::NodePath& nodes, 
 // inhereted Observer method: update().
 // This method queries the Model (i.e. the passed observer) for the selected objects
 // and recomputes the axis location
-void Selection::update( Observable* observable, void* data ) {
+void Selection::update(Observable* observable, void* data) {
+    printf("Selection::update\n");
     // see if this was the Model
     Model* model = dynamic_cast< Model* >( observable );
-    if(!model)
-        return;
+    if(model) {
+        // update the axes
+        Model::objRefList selectedObjects = model->_getSelection();
 
-    // update the axes
-    Model::objRefList selectedObjects = model->_getSelection();
+        // remove the axes if there are no objects
+        if( selectedObjects.size() <= 0 && containsNode( selectionNode.get() )) {
+            removeChild( selectionNode.get() );
+            removeChild( objectAxisGroup.get() );
+            objectAxisGroup->removeChildren( 0, objectAxisGroup->getNumChildren() );
+        }
 
-    // remove the axes if there are no objects
-    if( selectedObjects.size() <= 0 && containsNode( selectionNode.get() )) {
-        removeChild( selectionNode.get() );
-        removeChild( objectAxisGroup.get() );
-        objectAxisGroup->removeChildren( 0, objectAxisGroup->getNumChildren() );
+        // add the axes if there are some objects
+        if( selectedObjects.size() > 0 && !containsNode( selectionNode.get() )) {
+            addChild( selectionNode.get() );
+            addChild( objectAxisGroup.get() );
+        }
+
+        // recompute the center
+        if( selectedObjects.size() > 0 ) {
+            rebuildAxes( selectedObjects );
+        }
     }
-
-    // add the axes if there are some objects
-    if( selectedObjects.size() > 0 && !containsNode( selectionNode.get() )) {
-        addChild( selectionNode.get() );
-        addChild( objectAxisGroup.get() );
-    }
-
-    // recompute the center
-    if( selectedObjects.size() > 0 )
-        rebuildAxes( selectedObjects );
-
 }
 
 // set the state of the selector
 Selection::SelectionState Selection::setState( SelectionState newState ) {
 
-    bool addBack = removeChild( selectionNode.get() );
+    bool addBack = removeChild(selectionNode.get());
 
     switch( newState ) {
         case ROTATE:
@@ -663,14 +665,13 @@ Selection::SelectionState Selection::setState( SelectionState newState ) {
             scaler->setPosition( selectionNode->getPosition() );
             selectionNode = scaler;
             break;
-
         default:
             axes->setPosition( selectionNode->getPosition() );
             selectionNode = axes;
             break;
     }
 
-    if( addBack ) {
+    if(addBack) {
         addChild( selectionNode.get() );
     }
 
@@ -689,7 +690,6 @@ Selection::SelectionState Selection::setStateByKey( unsigned char key ) {
     SelectionState newState;
 
     switch( key ) {
-
         case BZ_ROTATE_KEY:
             rotator->setPosition( selectionNode->getPosition() );
             selectionNode = rotator;
@@ -711,8 +711,9 @@ Selection::SelectionState Selection::setStateByKey( unsigned char key ) {
             break;
     }
 
-    if( addBack )
+    if( addBack ) {
         addChild( selectionNode.get() );
+    }
 
     // make sure the view redraws and resizes the widget
     view->updateSelection();

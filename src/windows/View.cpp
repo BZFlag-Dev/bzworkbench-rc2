@@ -18,17 +18,17 @@
 const double View::DEFAULT_ZOOM = 75.0;
 
 // view constructor
-View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char *_label) : RenderWindow(_x,_y,_w,_h) {
+View::View(Model* m, MainWindow* _mw, 
+        int _x, int _y, int _w, int _h, const char *_label) : RenderWindow(_x,_y,_w,_h) {
 
     this->model = m;
 
     // set OSG viewport
     this->getCamera()->setViewport(new osg::Viewport(0,0,_w,_h));
-    this->getCamera()->setProjectionMatrixAsPerspective(
-            30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
+//    this->getCamera()->setProjectionMatrixAsPerspective(
+//            30.0f, static_cast<double>(_w)/static_cast<double>(_h), 1.0f, 10000.0f);
     this->getCamera()->setGraphicsContext(getGraphicsWindow());
     this->setThreadingModel(osgViewer::Viewer::SingleThreaded);
-
 
     this->root  = new osg::Group();
 
@@ -56,7 +56,7 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
 
     // make a new selection object
     this->selection = new Selection( this );
-
+    printf("Selection name %s\n", this->selection->getName().c_str());
     // add the selection
     // NOTE: this has to be the LAST child on the list, 
     // because it doesn't have Z-bufferring enabled!
@@ -70,7 +70,7 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
     this->cameraManipulatorRef = cameraManipulator;
     this->setCameraManipulator(cameraManipulator);
 
-    this->eventHandlers = new EventHandlerCollection( this );
+    this->eventHandlers = new EventHandlerCollection(this);
     // add the selectHandler
     selHandler = new selectHandler(this, cameraManipulator);
     this->eventHandlers->addEventHandler(
@@ -87,10 +87,17 @@ View::View(Model* m, MainWindow* _mw, int _x, int _y, int _w, int _h, const char
     this->modifiers[ FL_CTRL ] = false;
     this->modifiers[ FL_ALT ] = false;
     this->modifiers[ FL_META ] = false;
+
+    // initialize snap to grid variables
+    snappingEnabled = true;
+    scaleSnapSize = 1;
+    translateSnapSize = 1;
+    rotateSnapSize = 15;
 }
 
 
 // build the mouse button map
+// FS TODO Is this still needed??
 void View::buildMouseButtonMap() {
     mouseButtonMap = map< unsigned int, unsigned int > ();
     // default mapppings
@@ -107,6 +114,7 @@ View::~View() {
 
 // draw method (really simple)
 void View::draw(void) {
+    printf("View::draw()\n");
     frame();
 }
 
@@ -119,37 +127,40 @@ void View::updateSelection(float newDistance) {
 void View::updateSelection() {
     // get the distance from the eyepoint to the center of the trackball
     float dist = this->cameraManipulatorRef->getDistance();
+//    printf("dist: %f\n", dist);
     this->updateSelection(dist);
     // refresh
-    redraw();
+    // redraw();
 }
 
 // handle events
 int View::handle(int event) {
     int result = 1;
     int shiftState = Fl::event_state();
-
+    int event_clicks = Fl::event_clicks();
     // whatever the event was, we need to regenerate the modifier keys
     modifiers[ FL_SHIFT ] = (( shiftState & FL_SHIFT ) != 0);
-    modifiers[ FL_CTRL ] = (( shiftState & FL_CTRL ) != 0);
-    modifiers[ FL_META ] = (( shiftState & FL_META ) != 0);
-    modifiers[ FL_ALT ] = (( shiftState & FL_ALT ) != 0);
+    modifiers[ FL_CTRL  ] = (( shiftState & FL_CTRL )  != 0);
+    modifiers[ FL_META  ] = (( shiftState & FL_META )  != 0);
+    modifiers[ FL_ALT   ] = (( shiftState & FL_ALT )   != 0);
 
     e_key = Fl::event_key();
 
     selection->setStateByKey( e_key );
 
-//    printf("  >>View::handle(int event)\n");
     result = RenderWindow::handle(event);
-//    printf("  <<View::handle(int event)\n");
+    if (event == FL_DRAG) {
+    //    updateSelection();
+    }
+
     return result;
 }
 
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
+    printf("View::update %s\n", selection->getName().c_str());
     // refresh the selection
     selection->update(obs, data);
-
     // process data
     if( data != NULL ) {
         // get the message
