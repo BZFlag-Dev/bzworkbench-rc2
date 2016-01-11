@@ -40,7 +40,7 @@ RenderWindow::RenderWindow(int x, int y, int width, int height) : Fl_Gl_Window(x
 // resize method
 void RenderWindow::resize(int x, int y, int w, int h) {
     // resize the OSG render window
-    printf("RenderWindow::resize()\n");
+//    printf("RenderWindow::resize()\n");
     _gw->getEventQueue()->windowResize(x, y, w, h );
     _gw->resized(x,y,w,h);
 
@@ -74,16 +74,16 @@ int RenderWindow::handle(int event) {
     }
     switch(event){
         case FL_PUSH:
-            printf("RW: Push: %d, %d\n", Fl::event_x(), Fl::event_y());
+//            printf("RW: Push: %d, %d\n", Fl::event_x(), Fl::event_y());
             _gw->getEventQueue()->mouseButtonPress(
                     Fl::event_x(), Fl::event_y(), button);
             break;
         case FL_DRAG:
-            printf("RW: Drag: %d, %d\n", Fl::event_x(), Fl::event_y());
+//            printf("RW: Drag: %d, %d\n", Fl::event_x(), Fl::event_y());
             _gw->getEventQueue()->mouseMotion(Fl::event_x(), Fl::event_y());
             break;
         case FL_RELEASE:
-            printf("RW: Release: %d, %d\n", Fl::event_x(), Fl::event_y());
+//            printf("RW: Release: %d, %d\n", Fl::event_x(), Fl::event_y());
             _gw->getEventQueue()->mouseButtonRelease(
                     Fl::event_x(), Fl::event_y(), button);
             break;
@@ -103,7 +103,7 @@ int RenderWindow::handle(int event) {
             break;
         default:
             // pass other events to the base class
-            printf("event %s\n", fl_eventnames[event]);
+//            printf("event %s\n", fl_eventnames[event]);
             result = Fl_Gl_Window::handle(event);
             break;
     }

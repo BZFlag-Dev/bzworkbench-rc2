@@ -1,13 +1,18 @@
 
 Bugs:
-    - irratic view rotation when an object is selected   
-    - Crash on loading 
+    - Crash on loading specific maps
+
+Revive Existing currently broken Functionality
 
 Documentation:
     - User Manual
     - Design/Architecture
 
-Features
-    - Undo
+Features:
+    - Button to reset the view
+    - Undo/Redo
+    - Shortcut to put an element on ground level
+    - Show the name of an object
     - Improve the unix build system.
+    - Make it compile under Windows again.
 

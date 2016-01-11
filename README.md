@@ -1,28 +1,25 @@
 #BZWorkbench
 
-BZWorkbench is a full featured world editor for the game BZFlag. For the game see <http://www.BZFlag.org>.
+BZWorkbench is a full featured world editor for the game BZFlag.
 
-This fork is an attempt to get it working again and develop it further under
-modern versions of Linux.
+It was initially written for the Google summer of code program in 2007.
+After a few years of activity development stalled.
+It is currently under active development again.
 
-It was initaly written for the google summer of code program.
-
+The current version's functionality is limited, as the first
+goal was to make it compile again against the current versions
+of the libraries it depends on. Specifically Open Scene Graph.
 
 In its current state it:
 
-- compiles under Arch Linux
-- Can load and view maps
-
-
-You can rotate the map by using the pressing the left mouse
-button and moving the mouse on the screen. Using mouse+ctrl or
-mouse+alt, you can shift or scale the map.
-
+- Compiles under (Arch) Linux,
+- Can load and view maps,
+- Can Add, Edit and Remove objects.
 
 ![Screenshot](bzworkbenchscreenshot.png "Screenshot")
 
+Background information:
 
-<https://developers.google.com/open-source/gsoc/2007/#bzflag>
-
-<https://www.google-melange.com/gsoc/org2/google/gsoc2009/bzflag>
+1. <https://developers.google.com/open-source/gsoc/2007/#bzflag>
+2.  <https://www.google-melange.com/gsoc/org2/google/gsoc2009/bzflag>
 

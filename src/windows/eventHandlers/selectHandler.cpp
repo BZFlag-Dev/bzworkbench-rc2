@@ -39,7 +39,7 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
             viewer = dynamic_cast<View*>(&aa);
             if(viewer != NULL) {
                 Renderable* lsobj = (Renderable*)lastSelected;
-                printf("lsobj %p %s %s\n", lsobj, lsobj->getName().c_str(), Selection_NODE_NAME);
+                //printf("lsobj %p %s %s\n", lsobj, lsobj->getName().c_str(), Selection_NODE_NAME);
                 if(lsobj != NULL && !(lsobj->getName().compare(Selection_NODE_NAME))) {
                     printf("Yup yup\n");
                     // if the last event was a DRAG event, we need to update

@@ -136,7 +136,7 @@ void idle_callback(void*)
     } else {
         // DO Nothing
     }
-    Fl::repeat_timeout(0.5, idle_callback);
+    Fl::repeat_timeout(0.1, idle_callback);
 }
 
 

@@ -56,7 +56,6 @@ View::View(Model* m, MainWindow* _mw,
 
     // make a new selection object
     this->selection = new Selection( this );
-    printf("Selection name %s\n", this->selection->getName().c_str());
     // add the selection
     // NOTE: this has to be the LAST child on the list, 
     // because it doesn't have Z-bufferring enabled!
@@ -114,7 +113,7 @@ View::~View() {
 
 // draw method (really simple)
 void View::draw(void) {
-    printf("View::draw()\n");
+    //printf("View::draw()\n");
     frame();
 }
 
@@ -158,7 +157,7 @@ int View::handle(int event) {
 
 // update method (inherited from Observer)
 void View::update( Observable* obs, void* data ) {
-    printf("View::update %s\n", selection->getName().c_str());
+    // printf("View::update %s\n", selection->getName().c_str());
     // refresh the selection
     selection->update(obs, data);
     // process data
@@ -211,7 +210,6 @@ void View::update( Observable* obs, void* data ) {
                         SceneBuilder::markSelectedAndPreserveStateSet( obj );
                     else
                         SceneBuilder::markUnselectedAndRestoreStateSet( obj );
-
                     break;
                 }
             default:

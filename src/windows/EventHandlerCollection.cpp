@@ -75,13 +75,7 @@ bool EventHandlerCollection::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUI
     else if( eventHandlers.size() > 0 ) {
         bool handled = false;
         for( map< string, osg::ref_ptr< BZEventHandler > >::iterator i = eventHandlers.begin(); i != eventHandlers.end() && !handled; i++) {
-            printf("EventHandlerCollection::handle()\n");
             handled = i->second->handle(ea, aa);
-        }
-        if (handled) {
-            printf("handled\n");
-        } else {
-            printf("NOT!! handled\n");
         }
         return handled;
     } else {
