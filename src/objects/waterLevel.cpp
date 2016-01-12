@@ -14,45 +14,46 @@
 
 #include "objects/material.h"
 
-waterLevel::waterLevel() : DataEntry("waterLevel", "<name><height><matref>") {
-	name = string("water");
-	waterMaterial = NULL;
-	height = -1.0f;
+waterLevel::waterLevel() : DataEntry("waterLevel", "<name><height><matref>") 
+{
+    name = string("water");
+    waterMaterial = NULL;
+    height = -1.0f;
 }
 
 // get method
 string waterLevel::get(void) {
-	return toString();
+    return toString();
 }
 
 // bzw methods
 bool waterLevel::parse( std::string& line ) {
-	string key = BZWParser::key( line.c_str() );
-	string value = BZWParser::value( key.c_str(), line.c_str() );
-	
-	// check if we reached the end of the section
-	if ( key == "end" )
-		return false;
+    string key = BZWParser::key( line.c_str() );
+    string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	if ( key == "name" ) {
-		name = value;
-	}
-	else if ( key == "matref" ) {
-		material* mat = (material*)Model::command( MODEL_GET, "material", value );
-		if( mat )
-			waterMaterial = mat;
-		else
-			throw BZWReadError( this, string( "Couldn't find material, " ) + value );
+    // check if we reached the end of the section
+    if ( key == "end" )
+        return false;
 
-	}
-	else if ( key == "height" ) {
-		height = atof( value.c_str() );
-	}
-	else {
-		throw BZWReadError( this, string( "Unknown key, " ) + key );
-	}
+    if ( key == "name" ) {
+        name = value;
+    }
+    else if ( key == "matref" ) {
+        material* mat = (material*)Model::command( MODEL_GET, "material", value );
+        if( mat )
+            waterMaterial = mat;
+        else
+            throw BZWReadError( this, string( "Couldn't find material, " ) + value );
 
-	return true;
+    }
+    else if ( key == "height" ) {
+        height = atof( value.c_str() );
+    }
+    else {
+        throw BZWReadError( this, string( "Unknown key, " ) + key );
+    }
+
+    return true;
 }
 
 void waterLevel::finalize() {
@@ -61,18 +62,18 @@ void waterLevel::finalize() {
 
 // toString method
 string waterLevel::toString(void) {
-	string waterLevelHeightStr = string("  height " + ftoa(height) + "\n" );
-	string waterLevelMatStr = string("");
-	if(waterMaterial != NULL){
-		waterLevelMatStr = string("  matref " + waterMaterial->getName() + "\n" );
-	}
-		
-	return string(string("waterLevel\n") +
-						 "  name " + name + "\n" +
-						 waterLevelHeightStr +
-						 waterLevelMatStr +
-						 getUnusedText() + "\n" +
-						 "end\n");
+    string waterLevelHeightStr = string("  height " + ftoa(height) + "\n" );
+    string waterLevelMatStr = string("");
+    if(waterMaterial != NULL){
+        waterLevelMatStr = string("  matref " + waterMaterial->getName() + "\n" );
+    }
+
+    return string(string("waterLevel\n") +
+            "  name " + name + "\n" +
+            waterLevelHeightStr +
+            waterLevelMatStr +
+            getUnusedText() + "\n" +
+            "end\n");
 }
 
 

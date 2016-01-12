@@ -14,62 +14,63 @@
 
 #include "model/Model.h"
 
-world::world() : DataEntry("world", "<name><size><flagHeight><noWalls>") {
-	worldName = string("");
-	size = 400.0;
-	noWalls = false;
-	flagHeight = 10.0f;
+world::world() : DataEntry("world", "<name><size><flagHeight><noWalls>") 
+{
+    worldName = string("");
+    size = 400.0;
+    noWalls = false;
+    flagHeight = 10.0f;
 }
 
 // send the data
 string world::get(void) {
-	return toString();
+    return toString();
 }
 
 // bzw methods
 bool world::parse( std::string& line ) {
-	string key = BZWParser::key( line.c_str() );
-	string value = BZWParser::value( key.c_str(), line.c_str() );
-	
-	// check if we reached the end of the section
-	if ( key == "end" )
-		return false;
+    string key = BZWParser::key( line.c_str() );
+    string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	if ( key == "name" ) {
-		worldName = value;
-	}
-	else if ( key == "size" ) {
-		size = atof( value.c_str() );
-	}
-	else if ( key == "flagheight" ) {
-		flagHeight = atof( value.c_str() );
-	}
-	else if ( key == "nowalls" ) {
-		noWalls = true;
-	}
-	else {
-		throw BZWReadError( this, string( "Unknown key, " ) + key );
-	}
+    // check if we reached the end of the section
+    if ( key == "end" )
+        return false;
 
-	return true;
+    if ( key == "name" ) {
+        worldName = value;
+    }
+    else if ( key == "size" ) {
+        size = atof( value.c_str() );
+    }
+    else if ( key == "flagheight" ) {
+        flagHeight = atof( value.c_str() );
+    }
+    else if ( key == "nowalls" ) {
+        noWalls = true;
+    }
+    else {
+        throw BZWReadError( this, string( "Unknown key, " ) + key );
+    }
+
+    return true;
 }
 
 void world::finalize() {
-	// nothing to do
+    // nothing to do
 }
 
 // toString method
 string world::toString(void) {
-	string sizeString = string(ftoa(size));
-	string flagHeightString = string(ftoa(flagHeight));
-	return string(string("world\n") +
-						 (worldName.length() != 0 ? "  name " + worldName : "# name") + "\n" +
-						 "  size " + sizeString + "\n" +
-						 "  flagHeight " + flagHeightString + "\n" +
-							(noWalls == true ? "  noWalls\n" : "# noWalls\n") +
-							getUnusedText() +
-						 "end\n");
-				  
+    string sizeString = string(ftoa(size));
+    string flagHeightString = string(ftoa(flagHeight));
+    return string(string("world\n") +
+            (worldName.length() != 0 ? "  name " + worldName : "# name") + "\n" +
+            "  size " + sizeString + "\n" +
+            "  flagHeight " + flagHeightString + "\n" +
+            (noWalls == true ? "  noWalls\n" : "# noWalls\n") +
+            getUnusedText() +
+            "end\n");
+
 }
 
 // render method

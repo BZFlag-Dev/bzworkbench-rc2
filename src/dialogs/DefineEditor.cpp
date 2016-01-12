@@ -19,104 +19,104 @@
 #include "defines.h"
 
 DefineEditor::DefineEditor( Model* model ) :
-		Fl_Dialog( "Define Editor", 310, 200, Fl_Dialog::Fl_OK )
+    Fl_Dialog( "Define Editor", 310, 200, Fl_Dialog::Fl_OK )
 {
-	this->model = model;
+    this->model = model;
 
-	begin();
+    begin();
 
-	// physics label
-	defineLabel = new QuickLabel( "Defines: ", 5, 5 );
+    // physics label
+    defineLabel = new QuickLabel( "Defines: ", 5, 5 );
 
-	// physics browser
-	defineBrowser = new Fl_Multi_Browser( 5, 30, 225, 90 );
-	refreshDefineList();
+    // physics browser
+    defineBrowser = new Fl_Multi_Browser( 5, 30, 225, 90 );
+    refreshDefineList();
 
-	// physics buttons
-	removeButton = new Fl_Button( 235, 55, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
-	removeButton->callback( RemoveCallback, this );
-	editButton = new Fl_Button( 235, 80, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
-	editButton->callback( EditCallback, this );
+    // physics buttons
+    removeButton = new Fl_Button( 235, 55, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
+    removeButton->callback( RemoveCallback, this );
+    editButton = new Fl_Button( 235, 80, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
+    editButton->callback( EditCallback, this );
 
 
-	end();
+    end();
 
-	// add the callbacks
-	setOKEventHandler( OKCallback, this );
+    // add the callbacks
+    setOKEventHandler( OKCallback, this );
 }
 
 void DefineEditor::refreshDefineList() {
-	defineBrowser->clear();
+    defineBrowser->clear();
 
-	std::map<string, define* > defs = model->_getGroups();
+    std::map<string, define* > defs = model->_getGroups();
 
-	std::map<string, define* >::const_iterator i;
-	for ( i = defs.begin(); i != defs.end(); i++ ) {
-		defineBrowser->add( i->first.c_str() );
-	}
+    std::map<string, define* >::const_iterator i;
+    for ( i = defs.begin(); i != defs.end(); i++ ) {
+        defineBrowser->add( i->first.c_str() );
+    }
 }
 
 // OK callback
 void DefineEditor::OKCallback_real( Fl_Widget* w ) {
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }
 
 void DefineEditor::RemoveCallback_real( Fl_Widget* w ) {
-	const char* name = NULL;
-	for (int i = 1; i <= defineBrowser->size(); i++) {
-		if ( defineBrowser->selected( i ) ) {
-			name = defineBrowser->text( i );
-			break;
-		}
-	}
+    const char* name = NULL;
+    for (int i = 1; i <= defineBrowser->size(); i++) {
+        if ( defineBrowser->selected( i ) ) {
+            name = defineBrowser->text( i );
+            break;
+        }
+    }
 
-	if ( name == NULL )
-		return;
+    if ( name == NULL )
+        return;
 
-	map< string, define* > defs = model->_getGroups();
+    map< string, define* > defs = model->_getGroups();
 
-	if ( defs.count( string( name ) ) ) {
-		define* def = defs[ string( name ) ];
+    if ( defs.count( string( name ) ) ) {
+        define* def = defs[ string( name ) ];
 
-		model->_removeGroup( def );
-	}
+        model->_removeGroup( def );
+    }
 
-	refreshDefineList();
+    refreshDefineList();
 }
 
 void DefineEditor::EditCallback_real( Fl_Widget* w ) {
-	// find the first selected item
-	const char* name = NULL;
-	for (int i = 1; i <= defineBrowser->size(); i++) {
-		if ( defineBrowser->selected( i ) ) {
-			name = defineBrowser->text( i );
-			break;
-		}
-	}
+    // find the first selected item
+    const char* name = NULL;
+    for (int i = 1; i <= defineBrowser->size(); i++) {
+        if ( defineBrowser->selected( i ) ) {
+            name = defineBrowser->text( i );
+            break;
+        }
+    }
 
-	// make sure something was actually selected
-	if ( name == NULL )
-		return;
+    // make sure something was actually selected
+    if ( name == NULL )
+        return;
 
-	// get the material
-	define* def = dynamic_cast< define* >( model->_command( MODEL_GET, "define", string( name ) ) );
+    // get the material
+    define* def = dynamic_cast< define* >( model->_command( MODEL_GET, "define", string( name ) ) );
 
-	if ( def != NULL ) {
-		// make a rename dialog and show it
-		RenameDialog* dialog = new RenameDialog();
-		dialog->setName( def->getName() );
-		dialog->show();
+    if ( def != NULL ) {
+        // make a rename dialog and show it
+        RenameDialog* dialog = new RenameDialog();
+        dialog->setName( def->getName() );
+        dialog->show();
 
-		// wait until it is closed
-		while( dialog->shown() ) { Fl::wait(); }
+        // wait until it is closed
+        while( dialog->shown() ) { Fl::wait(); }
 
-		if ( !dialog->getCancelled() ) {
-			def->setName( dialog->getName() );
-		}
+        if ( !dialog->getCancelled() ) {
+            def->setName( dialog->getName() );
+        }
 
-		delete dialog;
-	}
+        delete dialog;
+    }
 
-	refreshDefineList();
+    refreshDefineList();
 }

@@ -16,19 +16,20 @@
 
 // constructor
 base::base() :
-	bz2object("base", "<name><position><rotation><size><team><color><oncap><shift><shear><scale><spin>") {
+    bz2object("base", "<name><position><rotation><size><team><color><oncap><shift><shear><scale><spin>") 
+{
 
-	setDefaults();
+    setDefaults();
 }
 
 void base::setDefaults() {
-	updateGeometry();
+    updateGeometry();
 
-	team = 0;
-	weapon = "";
+    team = 0;
+    weapon = "";
 
-	setPos( osg::Vec3(0.0, 0.0, 0.0) );
-	setSize( osg::Vec3(10.0, 10.0, 1.0) );
+    setPos( osg::Vec3(0.0, 0.0, 0.0) );
+    setSize( osg::Vec3(10.0, 10.0, 1.0) );
 
 }
 
@@ -37,190 +38,190 @@ string base::get(void) { return toString(); }
 
 // bzw methods
 bool base::parse( std::string& line ) {
-	string key = BZWParser::key( line.c_str() );
-	string value = BZWParser::value( key.c_str(), line.c_str() );
-	
-	// check if we reached the end of the section
-	if ( key == "end" )
-		return false;
+    string key = BZWParser::key( line.c_str() );
+    string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	// parse keys
-	if ( key == "color" || key == "team" ) {
-		// make sure that the team value is sane
-		int t = atoi( value.c_str() );
-		if(!(t == BASE_RED || t == BASE_GREEN || t == BASE_BLUE || t == BASE_PURPLE)) {
-			throw BZWReadError( this, string( "Invalid base team, " ) + value );
-		}
-		team = t;
-	}
-	else if ( key == "oncap" ) {
-		setWeapon( value.c_str() );
-	}
-	else {
-		return bz2object::parse( line );
-	}
+    // check if we reached the end of the section
+    if ( key == "end" )
+        return false;
 
-	return true;
+    // parse keys
+    if ( key == "color" || key == "team" ) {
+        // make sure that the team value is sane
+        int t = atoi( value.c_str() );
+        if(!(t == BASE_RED || t == BASE_GREEN || t == BASE_BLUE || t == BASE_PURPLE)) {
+            throw BZWReadError( this, string( "Invalid base team, " ) + value );
+        }
+        team = t;
+    }
+    else if ( key == "oncap" ) {
+        setWeapon( value.c_str() );
+    }
+    else {
+        return bz2object::parse( line );
+    }
+
+    return true;
 }
 
 void base::finalize() {
-	setBaseColor( team );
+    setBaseColor( team );
 }
 
 // tostring
 string base::toString() {
-	return string("base\n") +
-				  BZWLines( this ) +
-				  "  color " + string(itoa(team)) + "\n" +
-				  (weapon.length() != 0 ? "  oncap " + weapon + "\n" : "") +
-				  "end\n";
+    return string("base\n") +
+        BZWLines( this ) +
+        "  color " + string(itoa(team)) + "\n" +
+        (weapon.length() != 0 ? "  oncap " + weapon + "\n" : "") +
+        "end\n";
 }
 
 // render
 int base::render(void) {
-	return 0;
+    return 0;
 }
 
 // set the current team
 void base::setTeam( int t ) {
-	// set the team
-	team = t;
+    // set the team
+    team = t;
 
-	// set new color
-	setBaseColor( t );
+    // set new color
+    setBaseColor( t );
 }
 
 // setter (with binary data)
 // NOTE: don't call superclass update method, because it deals only with transformations (which are n/a here)
 int base::update(UpdateMessage& message) {
-	int result = bz2object::update( message );
+    int result = bz2object::update( message );
 
-	switch( message.type ) {
-		case UpdateMessage::SET_POSITION: 	// handle a new position
-			setPos( *(message.getAsPosition()) );
-			break;
+    switch( message.type ) {
+        case UpdateMessage::SET_POSITION: 	// handle a new position
+            setPos( *(message.getAsPosition()) );
+            break;
 
-		case UpdateMessage::SET_POSITION_FACTOR:	// handle a translation
-			setPos( getPos() + *(message.getAsPositionFactor()) );
-			break;
+        case UpdateMessage::SET_POSITION_FACTOR:	// handle a translation
+            setPos( getPos() + *(message.getAsPositionFactor()) );
+            break;
 
-		case UpdateMessage::SET_ROTATION:		// handle a new rotation
-			setRotationZ( message.getAsRotation()->z() );
-			break;
+        case UpdateMessage::SET_ROTATION:		// handle a new rotation
+            setRotationZ( message.getAsRotation()->z() );
+            break;
 
-		case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
-			setRotationZ( getRotation().z() + message.getAsRotationFactor()->z() );
-			break;
+        case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
+            setRotationZ( getRotation().z() + message.getAsRotationFactor()->z() );
+            break;
 
-		case UpdateMessage::SET_SCALE:		// handle a new scale
-			setSize( *(message.getAsScale()) );
-			break;
+        case UpdateMessage::SET_SCALE:		// handle a new scale
+            setSize( *(message.getAsScale()) );
+            break;
 
-		case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
-			setSize( getSize() + *(message.getAsScaleFactor()) );
-			break;
+        case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
+            setSize( getSize() + *(message.getAsScaleFactor()) );
+            break;
 
-		default:	// unknown event; don't handle
-			return result;
-	}
+        default:	// unknown event; don't handle
+            return result;
+    }
 
-	return 1;
+    return 1;
 }
 
 void base::setSize( osg::Vec3 newSize ) {
-	updateBaseUV( (osg::Group*)getThisNode(), newSize );
+    updateBaseUV( (osg::Group*)getThisNode(), newSize );
 
-	bz2object::setSize( newSize );
+    bz2object::setSize( newSize );
 }
 
 void base::updateGeometry() {
-	osg::Group* group = Primitives::buildUntexturedBox( osg::Vec3( 1, 1, 1 ) );
-	setThisNode( group );
+    osg::Group* group = Primitives::buildUntexturedBox( osg::Vec3( 1, 1, 1 ) );
+    setThisNode( group );
 
-	// make UV coordinates
-	updateBaseUV( group, getSize() );
+    // make UV coordinates
+    updateBaseUV( group, getSize() );
 
-	setBaseColor( getTeam() );
+    setBaseColor( getTeam() );
 }
 
 
 // regenerate base UVs
 void base::updateBaseUV( osg::Group* base, osg::Vec3 size ) {
-	// generate UVs
-	osg::Vec2Array* sideUVs[6];
-	for (int i = 0; i < 6; i++)
-		sideUVs[i] = new osg::Vec2Array();
+    // generate UVs
+    osg::Vec2Array* sideUVs[6];
+    for (int i = 0; i < 6; i++)
+        sideUVs[i] = new osg::Vec2Array();
 
-	// FIXME: properly generate side UVs for base
-	float xSideUV = 1;
-	float ySideUV = 1;
-	float zSideUV = 1;
-	float xTopUV = 1;
-	float yTopUV = 1;
+    // FIXME: properly generate side UVs for base
+    float xSideUV = 1;
+    float ySideUV = 1;
+    float zSideUV = 1;
+    float xTopUV = 1;
+    float yTopUV = 1;
 
-	// +x -x
-	for ( int i = 0; i < 2; i++ ) {
-		sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
-		sideUVs[i]->push_back( osg::Vec2( 0, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( ySideUV, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( ySideUV, 0 ) );
-	}
+    // +x -x
+    for ( int i = 0; i < 2; i++ ) {
+        sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
+        sideUVs[i]->push_back( osg::Vec2( 0, zSideUV ) );
+        sideUVs[i]->push_back( osg::Vec2( ySideUV, zSideUV ) );
+        sideUVs[i]->push_back( osg::Vec2( ySideUV, 0 ) );
+    }
 
-	// +y -y
-	for ( int i = 2; i < 4; i++ ) {
-		sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
-		sideUVs[i]->push_back( osg::Vec2( 0, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xSideUV, zSideUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xSideUV, 0 ) );
-	}
+    // +y -y
+    for ( int i = 2; i < 4; i++ ) {
+        sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
+        sideUVs[i]->push_back( osg::Vec2( 0, zSideUV ) );
+        sideUVs[i]->push_back( osg::Vec2( xSideUV, zSideUV ) );
+        sideUVs[i]->push_back( osg::Vec2( xSideUV, 0 ) );
+    }
 
-	// +z -z
-	for ( int i = 4; i < 6; i++ ) {
-		sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
-		sideUVs[i]->push_back( osg::Vec2( 0, yTopUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xTopUV, yTopUV ) );
-		sideUVs[i]->push_back( osg::Vec2( xTopUV, 0 ) );
-	}
+    // +z -z
+    for ( int i = 4; i < 6; i++ ) {
+        sideUVs[i]->push_back( osg::Vec2( 0, 0 ) );
+        sideUVs[i]->push_back( osg::Vec2( 0, yTopUV ) );
+        sideUVs[i]->push_back( osg::Vec2( xTopUV, yTopUV ) );
+        sideUVs[i]->push_back( osg::Vec2( xTopUV, 0 ) );
+    }
 
-	for ( int i = 0; i < 6; i++ ) {
-		osg::Geode* geode = (osg::Geode*)base->getChild( i );
-		osg::Geometry* geom = (osg::Geometry*)geode->getDrawable( 0 );
-		geom->setTexCoordArray( 0, sideUVs[i] );
-	}
+    for ( int i = 0; i < 6; i++ ) {
+        osg::Geode* geode = (osg::Geode*)base->getChild( i );
+        osg::Geometry* geom = (osg::Geometry*)geode->getDrawable( 0 );
+        geom->setTexCoordArray( 0, sideUVs[i] );
+    }
 }
 
 void base::setBaseColor( int team ) {
-	osg::Group* group = (osg::Group*)getThisNode();
+    osg::Group* group = (osg::Group*)getThisNode();
 
-	string wallTexFile;
-	string topTexFile;
+    string wallTexFile;
+    string topTexFile;
 
-	switch( team ) {
-		case BASE_RED:
-			wallTexFile = "red_basewall";
-			topTexFile = "red_basetop";
-			break;
-		case BASE_GREEN:
-			wallTexFile = "green_basewall";
-			topTexFile = "green_basetop";
-			break;
-		case BASE_BLUE:
-			wallTexFile = "blue_basewall";
-			topTexFile = "blue_basetop";
-			break;
-		case BASE_PURPLE:
-			wallTexFile = "purple_basewall";
-			topTexFile = "purple_basetop";
-			break;
-		default:
-			wallTexFile = "boxwall";
-			topTexFile = "roof";
-	}
+    switch( team ) {
+        case BASE_RED:
+            wallTexFile = "red_basewall";
+            topTexFile = "red_basetop";
+            break;
+        case BASE_GREEN:
+            wallTexFile = "green_basewall";
+            topTexFile = "green_basetop";
+            break;
+        case BASE_BLUE:
+            wallTexFile = "blue_basewall";
+            topTexFile = "blue_basetop";
+            break;
+        case BASE_PURPLE:
+            wallTexFile = "purple_basewall";
+            topTexFile = "purple_basetop";
+            break;
+        default:
+            wallTexFile = "boxwall";
+            topTexFile = "roof";
+    }
 
-	// associate textures with nodes
-	for (int i = 0; i < 4; i++)
-		SceneBuilder::assignTexture( wallTexFile.c_str(), group->getChild( i ), osg::StateAttribute::ON );
-	for (int i = 4; i < 6; i++)
-		SceneBuilder::assignTexture( topTexFile.c_str(), group->getChild( i ), osg::StateAttribute::ON );
+    // associate textures with nodes
+    for (int i = 0; i < 4; i++)
+        SceneBuilder::assignTexture( wallTexFile.c_str(), group->getChild( i ), osg::StateAttribute::ON );
+    for (int i = 4; i < 6; i++)
+        SceneBuilder::assignTexture( topTexFile.c_str(), group->getChild( i ), osg::StateAttribute::ON );
 
 }

@@ -13,41 +13,41 @@
 #include "dialogs/InfoConfigurationDialog.h"
 
 // constructor
-InfoConfigurationDialog::InfoConfigurationDialog( info* _theInfo ) :
-	ConfigurationDialog( _theInfo, "Info Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
-	begin();
+InfoConfigurationDialog::InfoConfigurationDialog( info* _theInfo ) : ConfigurationDialog( _theInfo, "Info Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
+    begin();
 
-	theInfo = _theInfo;
+    theInfo = _theInfo;
 
-	// set up the dialog
-	infoTextLabel = new QuickLabel( "Info text: ", 5, 5);
-	infoTextInput = new Fl_Multiline_Input( 5, 30, 290, 270 );
-	vector<string> lines = theInfo->getLines();
-	string value;
-	for ( vector<string>::iterator i = lines.begin(); i != lines.end(); i++ )
-		value += *i + "\n";
+    // set up the dialog
+    infoTextLabel = new QuickLabel( "Info text: ", 5, 5);
+    infoTextInput = new Fl_Multiline_Input( 5, 30, 290, 270 );
+    vector<string> lines = theInfo->getLines();
+    string value;
+    for ( vector<string>::iterator i = lines.begin(); i != lines.end(); i++ ) {
+        value += *i + "\n";
+    }
 
-	infoTextInput->value( value.c_str() );
+    infoTextInput->value( value.c_str() );
 
-	end();
+    end();
 
-	// add the callbacks
-	setOKEventHandler( OKCallback, this );
-	setCancelEventHandler( CancelCallback, this );
+    // add the callbacks
+    setOKEventHandler( OKCallback, this );
+    setCancelEventHandler( CancelCallback, this );
 
 }
 
 // OK callback
 void InfoConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
-	// call cone-specific setters from the UI
-	theInfo->setLines( BZWParser::getLines( "", infoTextInput->value() ) );
+    // call cone-specific setters from the UI
+    theInfo->setLines( BZWParser::getLines( "", infoTextInput->value() ) );
 
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }
 
 // Cancel callback
 void InfoConfigurationDialog::CancelCallback_real( Fl_Widget* w ) {
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }

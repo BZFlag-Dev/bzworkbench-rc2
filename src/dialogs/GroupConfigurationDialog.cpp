@@ -14,43 +14,43 @@
 
 // constructor
 GroupConfigurationDialog::GroupConfigurationDialog( group* _theGroup ) :
-	ConfigurationDialog( _theGroup, "Group Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
-	begin();
-	
-	theGroup = _theGroup;
+    ConfigurationDialog( _theGroup, "Group Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
+        begin();
 
-	defineLabel = new QuickLabel( "Define:", 5, 5 );
-	defineChoice = new Fl_Choice( 120, 5, 170, DEFAULT_TEXTSIZE + 6 );
+        theGroup = _theGroup;
 
-	// populate define choices
-	map< string, define* > defines = Model::getGroups();
-	for (map< string, define* >::iterator i = defines.begin(); i != defines.end(); i++ ) {
-		defineChoice->add( i->first.c_str() );
-	}
-	defineChoice->value( 0 );
-	
-	end();
-	
-	// add the callbacks
-	setOKEventHandler( OKCallback, this );
-	setCancelEventHandler( CancelCallback, this );
-	
-}
+        defineLabel = new QuickLabel( "Define:", 5, 5 );
+        defineChoice = new Fl_Choice( 120, 5, 170, DEFAULT_TEXTSIZE + 6 );
+
+        // populate define choices
+        map< string, define* > defines = Model::getGroups();
+        for (map< string, define* >::iterator i = defines.begin(); i != defines.end(); i++ ) {
+            defineChoice->add( i->first.c_str() );
+        }
+        defineChoice->value( 0 );
+
+        end();
+
+        // add the callbacks
+        setOKEventHandler( OKCallback, this );
+        setCancelEventHandler( CancelCallback, this );
+
+    }
 
 // OK callback
 void GroupConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
-	define* def = dynamic_cast< define* >( Model::command( MODEL_GET, "define", string( defineChoice->text() ) ) );
+    define* def = dynamic_cast< define* >( Model::command( MODEL_GET, "define", string( defineChoice->text() ) ) );
 
-	if ( def != NULL ) {
-		theGroup->setDefine( def );
-	}
+    if ( def != NULL ) {
+        theGroup->setDefine( def );
+    }
 
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }
 
 // Cancel callback
 void GroupConfigurationDialog::CancelCallback_real( Fl_Widget* w ) {
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }

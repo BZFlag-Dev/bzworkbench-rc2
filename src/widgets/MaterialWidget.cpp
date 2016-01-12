@@ -16,25 +16,24 @@
 MaterialWidget::MaterialWidget( const MaterialWidget& mat ) : Fl_Group( 0, 0, 0, 0 ) { end(); }
 
 // main constructor
-MaterialWidget::MaterialWidget( int x, int y, int width, int height, vector< string > materialChoices, material* _mat) :
-    Fl_Group( x, y, width, height ) {
+MaterialWidget::MaterialWidget( int x, int y, int width, int height, vector< string > materialChoices, material* _mat) : Fl_Group( x, y, width, height ) {
 
-        end();
+    end();
 
-        mat = _mat;
-        // do not resize children when resized
-        resizable(NULL);
-        activeButton = new Fl_Check_Button(x, y, DEFAULT_TEXTSIZE + 6, DEFAULT_TEXTSIZE + 6);
-        materialMenu = new Fl_Menu_Button(x + 30, y, width - 50, DEFAULT_TEXTSIZE + 12);
-        rgbaInput = new RGBAWidget(x + 30, y + 30);
-        texInput = new Fl_Input(x + 30, y + 30, width - 50, DEFAULT_TEXTSIZE + 6);
-        setMaterials( materialChoices );
-        setSelectedMaterial( "(none)" );
-        add( activeButton );
-        add( materialMenu );
-        add( rgbaInput );
-        add( texInput );
-    }
+    mat = _mat;
+    // do not resize children when resized
+    resizable(NULL);
+    activeButton = new Fl_Check_Button(x, y, DEFAULT_TEXTSIZE + 6, DEFAULT_TEXTSIZE + 6);
+    materialMenu = new Fl_Menu_Button(x + 30, y, width - 50, DEFAULT_TEXTSIZE + 12);
+    rgbaInput = new RGBAWidget(x + 30, y + 30);
+    texInput = new Fl_Input(x + 30, y + 30, width - 50, DEFAULT_TEXTSIZE + 6);
+    setMaterials( materialChoices );
+    setSelectedMaterial( "(none)" );
+    add( activeButton );
+    add( materialMenu );
+    add( rgbaInput );
+    add( texInput );
+}
 
 // set the current material
 void MaterialWidget::setSelectedMaterial( const string& material ) {

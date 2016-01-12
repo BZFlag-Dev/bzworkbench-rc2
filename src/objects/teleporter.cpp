@@ -16,30 +16,30 @@
 
 // constructor
 teleporter::teleporter() :
-	bz2object("teleporter", "<position><size><rotation><spin><shift><shear><scale><name><border>") {
+    bz2object("teleporter", "<position><size><rotation><spin><shift><shear><scale><name><border>") 
+{
+    setDefaults();
 
-	setDefaults();
-
-	// make sure geometry is built
-	updateGeometry();
+    // make sure geometry is built
+    updateGeometry();
 }
 
 void teleporter::setDefaults() {
-	osg::Group* teleporter = new osg::Group();
-	osg::Geode* portal = new osg::Geode();
-	osg::Geode* border = new osg::Geode();
+    osg::Group* teleporter = new osg::Group();
+    osg::Geode* portal = new osg::Geode();
+    osg::Geode* border = new osg::Geode();
 
-	teleporter->addChild( portal );
-	teleporter->addChild( border );
+    teleporter->addChild( portal );
+    teleporter->addChild( border );
 
-	setThisNode( teleporter );
+    setThisNode( teleporter );
 
-	osg::Vec3 scale = osg::Vec3( 0.5f, 10, 20 );
-	realSize = scale;
-	this->border = scale.x() * 2.0f;
-	texsize = 0.0f;
+    osg::Vec3 scale = osg::Vec3( 0.5f, 10, 20 );
+    realSize = scale;
+    this->border = scale.x() * 2.0f;
+    texsize = 0.0f;
 
-	setSize( scale );
+    setSize( scale );
 
 }
 
@@ -48,426 +48,426 @@ string teleporter::get(void) {  return toString(); }
 
 // setter
 /*int teleporter::update(string& data) {
-	// get header
-	const char* header = getHeader().c_str();
+// get header
+const char* header = getHeader().c_str();
 
-	// get the section
-	vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
+// get the section
+vector<string> lines = BZWParser::getSectionsByHeader(header, data.c_str());
 
-	if(lines[0] == BZW_NOT_FOUND)
-		return 0;
+if(lines[0] == BZW_NOT_FOUND)
+return 0;
 
-	if(!hasOnlyOne(lines, "teleporter"))
-		return 0;
+if(!hasOnlyOne(lines, "teleporter"))
+return 0;
 
-	// get the data
-	const char* teleporterData = lines[0].c_str();
+// get the data
+const char* teleporterData = lines[0].c_str();
 
-	// get the name if it's in the title
-	vector<string> names = BZWParser::getValuesByKey( "teleporter", header, teleporterData );
+// get the name if it's in the title
+vector<string> names = BZWParser::getValuesByKey( "teleporter", header, teleporterData );
 
-	// get the border
-	vector<string> borders = BZWParser::getValuesByKey( "border", header, teleporterData );
-	if( borders.size() > 1 ) {
-		printf("teleporter::update(): Error! Defined \"border\" %d times!\n", (int)borders.size());
-	}
+// get the border
+vector<string> borders = BZWParser::getValuesByKey( "border", header, teleporterData );
+if( borders.size() > 1 ) {
+printf("teleporter::update(): Error! Defined \"border\" %d times!\n", (int)borders.size());
+}
 
-	// get the size, since the teleporter scales differently than other objects
-	// the size must be parsed here
-	vector<string> sizes = BZWParser::getValuesByKey( "size", header, teleporterData );
+// get the size, since the teleporter scales differently than other objects
+// the size must be parsed here
+vector<string> sizes = BZWParser::getValuesByKey( "size", header, teleporterData );
 
-	// just go with the first size (only one should be defined)
-	if(sizes.size() > 0)
-		setSize( Point3D( sizes[0].c_str() ) );
+// just go with the first size (only one should be defined)
+if(sizes.size() > 0)
+setSize( Point3D( sizes[0].c_str() ) );
 
 
-	if( !bz2object::update( data ) )
-		return 0;
+if( !bz2object::update( data ) )
+return 0;
 
-	// reset the scale so that it doesn't effect the size of the object
-	bz2object::setSize( osg::Vec3( 1, 1, 1 ) );
+// reset the scale so that it doesn't effect the size of the object
+bz2object::setSize( osg::Vec3( 1, 1, 1 ) );
 
-	if( names.size() > 0 ) setName( names[0] );
+if( names.size() > 0 ) setName( names[0] );
 
-	// set the data
-	setBorder( (borders.size() != 0 ? atof( borders[0].c_str() ) : 0.0f) );
+// set the data
+setBorder( (borders.size() != 0 ? atof( borders[0].c_str() ) : 0.0f) );
 
-	return 1;
+return 1;
 }*/
 
 // update with binary message
 int teleporter::update( UpdateMessage& message ) {
 
-	// superclass event handler
-	int result = bz2object::update( message );
+    // superclass event handler
+    int result = bz2object::update( message );
 
-	switch( message.type ) {
-		case UpdateMessage::SET_POSITION: 	// handle a new position
-			setPos( *(message.getAsPosition()) );
-			break;
+    switch( message.type ) {
+        case UpdateMessage::SET_POSITION: 	// handle a new position
+            setPos( *(message.getAsPosition()) );
+            break;
 
-		case UpdateMessage::SET_POSITION_FACTOR:	// handle a translation
-			setPos( getPos() + *(message.getAsPositionFactor()) );
-			break;
+        case UpdateMessage::SET_POSITION_FACTOR:	// handle a translation
+            setPos( getPos() + *(message.getAsPositionFactor()) );
+            break;
 
-		case UpdateMessage::SET_ROTATION:		// handle a new rotation
-			setRotationZ( message.getAsRotation()->z() );
-			break;
+        case UpdateMessage::SET_ROTATION:		// handle a new rotation
+            setRotationZ( message.getAsRotation()->z() );
+            break;
 
-		case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
-			setRotationZ( getRotation().z() + message.getAsRotationFactor()->z() );
-			break;
+        case UpdateMessage::SET_ROTATION_FACTOR:	// handle an angular translation
+            setRotationZ( getRotation().z() + message.getAsRotationFactor()->z() );
+            break;
 
-		case UpdateMessage::SET_SCALE:		// handle a new scale
-			setSize( *(message.getAsScale()) );
-			break;
+        case UpdateMessage::SET_SCALE:		// handle a new scale
+            setSize( *(message.getAsScale()) );
+            break;
 
-		case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
-			setSize( getSize() + *(message.getAsScaleFactor()) );
-			break;
+        case UpdateMessage::SET_SCALE_FACTOR:	// handle a scaling factor
+            setSize( getSize() + *(message.getAsScaleFactor()) );
+            break;
 
-		default:	// unknown event; don't handle
-			return result;
-	}
+        default:	// unknown event; don't handle
+            return result;
+    }
 
-	return 1;
+    return 1;
 }
 
 // bzw methods
 bool teleporter::parse( std::string& line ) {
-	string key = BZWParser::key( line.c_str() );
-	string value = BZWParser::value( key.c_str(), line.c_str() );
-	
-	// check if we reached the end of the section
-	if ( key == "end" )
-		return false;
+    string key = BZWParser::key( line.c_str() );
+    string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	// parse keys
-	if ( key == "border" ) {
-		border = atof( value.c_str() );
-	}
-	else if ( key == "size" ) {
-		realSize = Point3D( value.c_str() );
-	}
-	else {
-		return bz2object::parse( line );
-	}
+    // check if we reached the end of the section
+    if ( key == "end" )
+        return false;
 
-	return true;
+    // parse keys
+    if ( key == "border" ) {
+        border = atof( value.c_str() );
+    }
+    else if ( key == "size" ) {
+        realSize = Point3D( value.c_str() );
+    }
+    else {
+        return bz2object::parse( line );
+    }
+
+    return true;
 }
 
 void teleporter::finalize() {
-	updateGeometry();
+    updateGeometry();
 }
 
 // tostring
 string teleporter::toString(void) {
 
-	// get the bz2object BZW lines
-	string bzwlines = BZWLines( this );
+    // get the bz2object BZW lines
+    string bzwlines = BZWLines( this );
 
-	// finally, make that string
-	return string("teleporter") + "\n" +
-				  bzwlines +
-				  "  border " + string(ftoa(border)) + "\n" +
-				  "end\n";
+    // finally, make that string
+    return string("teleporter") + "\n" +
+        bzwlines +
+        "  border " + string(ftoa(border)) + "\n" +
+        "end\n";
 }
 
 void teleporter::setSize( osg::Vec3 newSize ) {
-	realSize = newSize;
-	updateGeometry();
+    realSize = newSize;
+    updateGeometry();
 }
 
 void teleporter::setBorder( float newBorder ) {
-	border = newBorder;
-	updateGeometry();
+    border = newBorder;
+    updateGeometry();
 }
 
 void teleporter::setTexsize( float value ) {
-	texsize = value;
-	updateGeometry();
+    texsize = value;
+    updateGeometry();
 }
 
 // build a teleporter
 void teleporter::updateGeometry() {
-	osg::Group* teleporter = (osg::Group*)getThisNode();
-	osg::Geode* portal = (osg::Geode*)teleporter->getChild( 0 );
-	osg::Geode* border = (osg::Geode*)teleporter->getChild( 1 );
+    osg::Group* teleporter = (osg::Group*)getThisNode();
+    osg::Geode* portal = (osg::Geode*)teleporter->getChild( 0 );
+    osg::Geode* border = (osg::Geode*)teleporter->getChild( 1 );
 
-	// generate mesh and texture coordinates
-	updateTeleporterMesh( teleporter, getSize(), getBorder() );
-	updateTeleporterUV( teleporter, getSize(), getBorder() );
+    // generate mesh and texture coordinates
+    updateTeleporterMesh( teleporter, getSize(), getBorder() );
+    updateTeleporterUV( teleporter, getSize(), getBorder() );
 
-	// assign the textures
-	SceneBuilder::assignTexture( "telelink", portal, osg::StateAttribute::ON );
-	SceneBuilder::assignTexture( "caution", border, osg::StateAttribute::ON );
+    // assign the textures
+    SceneBuilder::assignTexture( "telelink", portal, osg::StateAttribute::ON );
+    SceneBuilder::assignTexture( "caution", border, osg::StateAttribute::ON );
 }
 
 // regenerate the UVs for a teleporter, call whenever the size is changed
 void teleporter::updateTeleporterUV( osg::Group* tele, osg::Vec3 size,
-									 const float borderSize ) {
-	// get portal and border geometries
-	osg::Geode* portal = (osg::Geode*)tele->getChild( 0 );
-	osg::Geode* border = (osg::Geode*)tele->getChild( 1 );
-	osg::Geometry* portalGeometry = (osg::Geometry*)portal->getDrawable( 0 );
-	osg::Geometry* borderGeometry = (osg::Geometry*)border->getDrawable( 0 );
+        const float borderSize ) {
+    // get portal and border geometries
+    osg::Geode* portal = (osg::Geode*)tele->getChild( 0 );
+    osg::Geode* border = (osg::Geode*)tele->getChild( 1 );
+    osg::Geometry* portalGeometry = (osg::Geometry*)portal->getDrawable( 0 );
+    osg::Geometry* borderGeometry = (osg::Geometry*)border->getDrawable( 0 );
 
-	// make new UV arrays and assign them
-	osg::Vec2Array* portalUVs = new osg::Vec2Array();
-	osg::Vec2Array* borderUVs = new osg::Vec2Array();
-	portalGeometry->setTexCoordArray( 0, portalUVs );
-	borderGeometry->setTexCoordArray( 0, borderUVs );
+    // make new UV arrays and assign them
+    osg::Vec2Array* portalUVs = new osg::Vec2Array();
+    osg::Vec2Array* borderUVs = new osg::Vec2Array();
+    portalGeometry->setTexCoordArray( 0, portalUVs );
+    borderGeometry->setTexCoordArray( 0, borderUVs );
 
-	const bool wantBorder = (borderSize >= 0.001f);
+    const bool wantBorder = (borderSize >= 0.001f);
 
-	float texScale;
-	if (texsize == 0.0f) {
-		texScale = 1.0f / this->border;
-	}
-	else if (texsize > 0.0f) {
-		texScale = 1.0f / texsize;
-	}
-	else {
-		texScale = -texsize;
-	}
+    float texScale;
+    if (texsize == 0.0f) {
+        texScale = 1.0f / this->border;
+    }
+    else if (texsize > 0.0f) {
+        texScale = 1.0f / texsize;
+    }
+    else {
+        texScale = -texsize;
+    }
 
-	const float br = borderSize;
-	const float hb = br * 0.5f;
-	const float yo = size.y() + br;
-	//const float ym = size.y() + hb;
-	const float yi = size.y();
-	//const float xl = size.x();
-	const float xb = (size.x() > hb) ? size.x() : hb;
-	const float zt = size.z() + br;
-	//const float zm = size.z() + hb;
-	const float zb = size.z();
+    const float br = borderSize;
+    const float hb = br * 0.5f;
+    const float yo = size.y() + br;
+    //const float ym = size.y() + hb;
+    const float yi = size.y();
+    //const float xl = size.x();
+    const float xb = (size.x() > hb) ? size.x() : hb;
+    const float zt = size.z() + br;
+    //const float zm = size.z() + hb;
+    const float zb = size.z();
 
-	const float ztxc = zb / (2.0f * yi);
-	portalUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
-	portalUVs->push_back( osg::Vec2( 1.0f, 0.0f ) ); // t1
-	portalUVs->push_back( osg::Vec2( 1.0f, ztxc ) ); // t2
-	portalUVs->push_back( osg::Vec2( 0.0f, ztxc ) ); // t3
-	portalUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
-	portalUVs->push_back( osg::Vec2( 1.0f, 0.0f ) ); // t1
-	portalUVs->push_back( osg::Vec2( 1.0f, ztxc ) ); // t2
-	portalUVs->push_back( osg::Vec2( 0.0f, ztxc ) ); // t3
+    const float ztxc = zb / (2.0f * yi);
+    portalUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+    portalUVs->push_back( osg::Vec2( 1.0f, 0.0f ) ); // t1
+    portalUVs->push_back( osg::Vec2( 1.0f, ztxc ) ); // t2
+    portalUVs->push_back( osg::Vec2( 0.0f, ztxc ) ); // t3
+    portalUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+    portalUVs->push_back( osg::Vec2( 1.0f, 0.0f ) ); // t1
+    portalUVs->push_back( osg::Vec2( 1.0f, ztxc ) ); // t2
+    portalUVs->push_back( osg::Vec2( 0.0f, ztxc ) ); // t3
 
-	if ( wantBorder ) {
-		const osg::Vec2 xTexOffset( +yo, -zt );
-		const float xb2 = xb * 2.0f;
-		const float yo2 = yo * 2.0f;
-		const float b2yi = br + (yi * 2.0f);
+    if ( wantBorder ) {
+        const osg::Vec2 xTexOffset( +yo, -zt );
+        const float xb2 = xb * 2.0f;
+        const float yo2 = yo * 2.0f;
+        const float b2yi = br + (yi * 2.0f);
 
-		// -x faces
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yo, 0.0f )) * texScale ); // t4
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yi, 0.0f )) * texScale ); // t5
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yi, 0.0f )) * texScale ); // t8
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yo, 0.0f )) * texScale ); // t9
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
+        // -x faces
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yo, 0.0f )) * texScale ); // t4
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yi, 0.0f )) * texScale ); // t5
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yi, 0.0f )) * texScale ); // t8
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yo, 0.0f )) * texScale ); // t9
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
 
-		// +x faces
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yo, 0.0f )) * texScale ); // t4
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yi, 0.0f )) * texScale ); // t5
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
-		borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yi, 0.0f )) * texScale ); // t8
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yo, 0.0f )) * texScale ); // t9
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
-		borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
+        // +x faces
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yo, 0.0f )) * texScale ); // t4
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yi, 0.0f )) * texScale ); // t5
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yi,   zb )) * texScale ); // t6
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
+        borderUVs->push_back( (xTexOffset + osg::Vec2( -yo,   zt )) * texScale ); // t11
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yi, 0.0f )) * texScale ); // t8
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yo, 0.0f )) * texScale ); // t9
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yo,   zt )) * texScale ); // t10
+        borderUVs->push_back( (xTexOffset + osg::Vec2( +yi,   zb )) * texScale ); // t7
 
-		// +y outside
-		borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
-		borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
-		borderUVs->push_back( osg::Vec2( +xb2,  0.0f ) * texScale );			  // t12
-		borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+        // +y outside
+        borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
+        borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
+        borderUVs->push_back( osg::Vec2( +xb2,  0.0f ) * texScale );			  // t12
+        borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
 
-		// -y outside
-		borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
-		borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
-		borderUVs->push_back( osg::Vec2( +xb2,  0.0f ) * texScale );			  // t12
-		borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+        // -y outside
+        borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
+        borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
+        borderUVs->push_back( osg::Vec2( +xb2,  0.0f ) * texScale );			  // t12
+        borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
 
-		// +y inside
-		borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
-		borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
-		borderUVs->push_back( osg::Vec2( +xb2,   -br ) * texScale );			  // t16
-		borderUVs->push_back( osg::Vec2( 0.0f,   -br ) * texScale );			  // t15
+        // +y inside
+        borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
+        borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
+        borderUVs->push_back( osg::Vec2( +xb2,   -br ) * texScale );			  // t16
+        borderUVs->push_back( osg::Vec2( 0.0f,   -br ) * texScale );			  // t15
 
-		// -y inside
-		borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
-		borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
-		borderUVs->push_back( osg::Vec2( +xb2,   -br ) * texScale );			  // t16
-		borderUVs->push_back( osg::Vec2( 0.0f,   -br ) * texScale );			  // t15
+        // -y inside
+        borderUVs->push_back( osg::Vec2( 0.0f,   -zt ) * texScale );			  // t13
+        borderUVs->push_back( osg::Vec2( +xb2,   -zt ) * texScale );			  // t14
+        borderUVs->push_back( osg::Vec2( +xb2,   -br ) * texScale );			  // t16
+        borderUVs->push_back( osg::Vec2( 0.0f,   -br ) * texScale );			  // t15
 
-		// crossbar top
-		borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
-		borderUVs->push_back( osg::Vec2( 0.0f,  -xb2 ) * texScale );			  // t18
-		borderUVs->push_back( osg::Vec2( +yo2,  -xb2 ) * texScale );			  // t19
-		borderUVs->push_back( osg::Vec2( +yo2,  0.0f ) * texScale );			  // t17
+        // crossbar top
+        borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+        borderUVs->push_back( osg::Vec2( 0.0f,  -xb2 ) * texScale );			  // t18
+        borderUVs->push_back( osg::Vec2( +yo2,  -xb2 ) * texScale );			  // t19
+        borderUVs->push_back( osg::Vec2( +yo2,  0.0f ) * texScale );			  // t17
 
-		// crossbar bottom
-		borderUVs->push_back( osg::Vec2( +br,   0.0f ) * texScale );			  // t20
-		borderUVs->push_back( osg::Vec2( +br,   -xb2 ) * texScale );			  // t21
-		borderUVs->push_back( osg::Vec2( +b2yi, -xb2 ) * texScale );			  // t23
-		borderUVs->push_back( osg::Vec2( +b2yi, 0.0f ) * texScale );			  // t22
+        // crossbar bottom
+        borderUVs->push_back( osg::Vec2( +br,   0.0f ) * texScale );			  // t20
+        borderUVs->push_back( osg::Vec2( +br,   -xb2 ) * texScale );			  // t21
+        borderUVs->push_back( osg::Vec2( +b2yi, -xb2 ) * texScale );			  // t23
+        borderUVs->push_back( osg::Vec2( +b2yi, 0.0f ) * texScale );			  // t22
 
-		// +y pillar cap
-		borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
-		borderUVs->push_back( osg::Vec2( 0.0f,  -xb2 ) * texScale );			  // t18
-		borderUVs->push_back( osg::Vec2( +br,   -xb2 ) * texScale );			  // t21
-		borderUVs->push_back( osg::Vec2( +br,   0.0f ) * texScale );			  // t20
+        // +y pillar cap
+        borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+        borderUVs->push_back( osg::Vec2( 0.0f,  -xb2 ) * texScale );			  // t18
+        borderUVs->push_back( osg::Vec2( +br,   -xb2 ) * texScale );			  // t21
+        borderUVs->push_back( osg::Vec2( +br,   0.0f ) * texScale );			  // t20
 
-		// -y pillar cap
-		borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
-		borderUVs->push_back( osg::Vec2( 0.0f,  -xb2 ) * texScale );			  // t18
-		borderUVs->push_back( osg::Vec2( +br,   -xb2 ) * texScale );			  // t21
-		borderUVs->push_back( osg::Vec2( +br,   0.0f ) * texScale );			  // t20
-	}
+        // -y pillar cap
+        borderUVs->push_back( osg::Vec2( 0.0f, 0.0f ) ); // t0
+        borderUVs->push_back( osg::Vec2( 0.0f,  -xb2 ) * texScale );			  // t18
+        borderUVs->push_back( osg::Vec2( +br,   -xb2 ) * texScale );			  // t21
+        borderUVs->push_back( osg::Vec2( +br,   0.0f ) * texScale );			  // t20
+    }
 }
 
 // rebuild the mesh for a teleporter, call whenever the border size is changed
 void teleporter::updateTeleporterMesh( osg::Group* tele, osg::Vec3 size,
-									   const float borderSize ) {
-	osg::Geode* portal = (osg::Geode*)tele->getChild( 0 );
-	osg::Geode* border = (osg::Geode*)tele->getChild( 1 );
+        const float borderSize ) {
+    osg::Geode* portal = (osg::Geode*)tele->getChild( 0 );
+    osg::Geode* border = (osg::Geode*)tele->getChild( 1 );
 
-	// remove any old drawables before we add new ones
-	if (portal->getNumDrawables() > 0)
-		portal->removeDrawables( 0 );
-	if (border->getNumDrawables() > 0)
-		border->removeDrawables( 0 );
+    // remove any old drawables before we add new ones
+    if (portal->getNumDrawables() > 0)
+        portal->removeDrawables( 0 );
+    if (border->getNumDrawables() > 0)
+        border->removeDrawables( 0 );
 
-	osg::Geometry* portalGeometry = new osg::Geometry();
-	osg::Geometry* borderGeometry = new osg::Geometry();
-	portal->addDrawable( portalGeometry );
-	border->addDrawable( borderGeometry );
+    osg::Geometry* portalGeometry = new osg::Geometry();
+    osg::Geometry* borderGeometry = new osg::Geometry();
+    portal->addDrawable( portalGeometry );
+    border->addDrawable( borderGeometry );
 
-	osg::Vec3Array* portalVerts = new osg::Vec3Array();
-	osg::Vec3Array* borderVerts = new osg::Vec3Array();
-	portalGeometry->setVertexArray( portalVerts );
-	borderGeometry->setVertexArray( borderVerts );
+    osg::Vec3Array* portalVerts = new osg::Vec3Array();
+    osg::Vec3Array* borderVerts = new osg::Vec3Array();
+    portalGeometry->setVertexArray( portalVerts );
+    borderGeometry->setVertexArray( borderVerts );
 
-	osg::DrawElementsUInt* portalDE = new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
-	osg::DrawElementsUInt* borderDE = new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
-	portalGeometry->addPrimitiveSet( portalDE );
-	borderGeometry->addPrimitiveSet( borderDE );
+    osg::DrawElementsUInt* portalDE = new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
+    osg::DrawElementsUInt* borderDE = new osg::DrawElementsUInt( osg::PrimitiveSet::QUADS, 0 );
+    portalGeometry->addPrimitiveSet( portalDE );
+    borderGeometry->addPrimitiveSet( borderDE );
 
-	const bool wantBorder = (borderSize >= 0.001f);
-	const float br = borderSize;
-	const float hb = br * 0.5f;
-	const float yo = size.y() + br;
-	//const float ym = size.y() + hb;
-	const float yi = size.y();
-	const float xl = size.x();
-	const float xb = (size.x() > hb) ? size.x() : hb;
-	const float zt = size.z() + br;
-	//const float zm = size.z() + hb;
-	const float zb = size.z();
+    const bool wantBorder = (borderSize >= 0.001f);
+    const float br = borderSize;
+    const float hb = br * 0.5f;
+    const float yo = size.y() + br;
+    //const float ym = size.y() + hb;
+    const float yi = size.y();
+    const float xl = size.x();
+    const float xb = (size.x() > hb) ? size.x() : hb;
+    const float zt = size.z() + br;
+    //const float zm = size.z() + hb;
+    const float zb = size.z();
 
     // back face vertices  (-x normal)
-	portalVerts->push_back( osg::Vec3( -xl, +yi, 0.0f ) ); // v0
-	portalVerts->push_back( osg::Vec3( -xl, -yi, 0.0f ) ); // v1
-	portalVerts->push_back( osg::Vec3( -xl, -yi,   zb ) ); // v2
-	portalVerts->push_back( osg::Vec3( -xl, +yi,   zb ) ); // v3
-	// front face vertices (+x normal)
-	portalVerts->push_back( osg::Vec3( +xl, -yi, 0.0f ) ); // v4
-	portalVerts->push_back( osg::Vec3( +xl, +yi, 0.0f ) ); // v5
-	portalVerts->push_back( osg::Vec3( +xl, +yi,   zb ) ); // v6
-	portalVerts->push_back( osg::Vec3( +xl, -yi,   zb ) ); // v7
+    portalVerts->push_back( osg::Vec3( -xl, +yi, 0.0f ) ); // v0
+    portalVerts->push_back( osg::Vec3( -xl, -yi, 0.0f ) ); // v1
+    portalVerts->push_back( osg::Vec3( -xl, -yi,   zb ) ); // v2
+    portalVerts->push_back( osg::Vec3( -xl, +yi,   zb ) ); // v3
+    // front face vertices (+x normal)
+    portalVerts->push_back( osg::Vec3( +xl, -yi, 0.0f ) ); // v4
+    portalVerts->push_back( osg::Vec3( +xl, +yi, 0.0f ) ); // v5
+    portalVerts->push_back( osg::Vec3( +xl, +yi,   zb ) ); // v6
+    portalVerts->push_back( osg::Vec3( +xl, -yi,   zb ) ); // v7
 
-	for ( int i = 0; i < 8; i++ )
-		portalDE->push_back( i );
+    for ( int i = 0; i < 8; i++ )
+        portalDE->push_back( i );
 
-	// only make the border if it is needed
-	if (wantBorder) {
-		// -x faces
-		borderVerts->push_back( osg::Vec3( -xb, +yo, 0.0f ) ); // v8
-		borderVerts->push_back( osg::Vec3( -xb, +yi, 0.0f ) ); // v9
-		borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
-		borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
-		borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
-		borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
-		borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
-		borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
-		borderVerts->push_back( osg::Vec3( -xb, -yi, 0.0f ) ); // v12
-		borderVerts->push_back( osg::Vec3( -xb, -yo, 0.0f ) ); // v13
-		borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
-		borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
+    // only make the border if it is needed
+    if (wantBorder) {
+        // -x faces
+        borderVerts->push_back( osg::Vec3( -xb, +yo, 0.0f ) ); // v8
+        borderVerts->push_back( osg::Vec3( -xb, +yi, 0.0f ) ); // v9
+        borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
+        borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
+        borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
+        borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
+        borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
+        borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
+        borderVerts->push_back( osg::Vec3( -xb, -yi, 0.0f ) ); // v12
+        borderVerts->push_back( osg::Vec3( -xb, -yo, 0.0f ) ); // v13
+        borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
+        borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
 
-		// +x faces
-		borderVerts->push_back( osg::Vec3( +xb, -yo, 0.0f ) ); // v16
-		borderVerts->push_back( osg::Vec3( +xb, -yi, 0.0f ) ); // v17
-		borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
-		borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
-		borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
-		borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
-		borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
-		borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
-		borderVerts->push_back( osg::Vec3( +xb, +yi, 0.0f ) ); // v20
-		borderVerts->push_back( osg::Vec3( +xb, +yo, 0.0f ) ); // v21
-		borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
-		borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
+        // +x faces
+        borderVerts->push_back( osg::Vec3( +xb, -yo, 0.0f ) ); // v16
+        borderVerts->push_back( osg::Vec3( +xb, -yi, 0.0f ) ); // v17
+        borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
+        borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
+        borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
+        borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
+        borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
+        borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
+        borderVerts->push_back( osg::Vec3( +xb, +yi, 0.0f ) ); // v20
+        borderVerts->push_back( osg::Vec3( +xb, +yo, 0.0f ) ); // v21
+        borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
+        borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
 
-		// +y outside
-		borderVerts->push_back( osg::Vec3( +xb, +yo, 0.0f ) ); // v21
-		borderVerts->push_back( osg::Vec3( -xb, +yo, 0.0f ) ); // v8
-		borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
-		borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
+        // +y outside
+        borderVerts->push_back( osg::Vec3( +xb, +yo, 0.0f ) ); // v21
+        borderVerts->push_back( osg::Vec3( -xb, +yo, 0.0f ) ); // v8
+        borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
+        borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
 
-		// -y outside
-		borderVerts->push_back( osg::Vec3( -xb, -yo, 0.0f ) ); // v13
-		borderVerts->push_back( osg::Vec3( +xb, -yo, 0.0f ) ); // v16
-		borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
-		borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
+        // -y outside
+        borderVerts->push_back( osg::Vec3( -xb, -yo, 0.0f ) ); // v13
+        borderVerts->push_back( osg::Vec3( +xb, -yo, 0.0f ) ); // v16
+        borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
+        borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
 
-		// +y inside
-		borderVerts->push_back( osg::Vec3( -xb, +yi, 0.0f ) ); // v9
-		borderVerts->push_back( osg::Vec3( +xb, +yi, 0.0f ) ); // v20
-		borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
-		borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
+        // +y inside
+        borderVerts->push_back( osg::Vec3( -xb, +yi, 0.0f ) ); // v9
+        borderVerts->push_back( osg::Vec3( +xb, +yi, 0.0f ) ); // v20
+        borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
+        borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
 
-		// -y inside
-		borderVerts->push_back( osg::Vec3( +xb, -yi, 0.0f ) ); // v17
-		borderVerts->push_back( osg::Vec3( -xb, -yi, 0.0f ) ); // v12
-		borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
-		borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
+        // -y inside
+        borderVerts->push_back( osg::Vec3( +xb, -yi, 0.0f ) ); // v17
+        borderVerts->push_back( osg::Vec3( -xb, -yi, 0.0f ) ); // v12
+        borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
+        borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
 
-		// crossbar top
-		borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
-		borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
-		borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
-		borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
+        // crossbar top
+        borderVerts->push_back( osg::Vec3( -xb, -yo,   zt ) ); // v14
+        borderVerts->push_back( osg::Vec3( +xb, -yo,   zt ) ); // v23
+        borderVerts->push_back( osg::Vec3( +xb, +yo,   zt ) ); // v22
+        borderVerts->push_back( osg::Vec3( -xb, +yo,   zt ) ); // v15
 
-		// crossbar bottom
-		borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
-		borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
-		borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
-		borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
+        // crossbar bottom
+        borderVerts->push_back( osg::Vec3( -xb, +yi,   zb ) ); // v10
+        borderVerts->push_back( osg::Vec3( +xb, +yi,   zb ) ); // v19
+        borderVerts->push_back( osg::Vec3( +xb, -yi,   zb ) ); // v18
+        borderVerts->push_back( osg::Vec3( -xb, -yi,   zb ) ); // v11
 
-		// +y pillar cap
-		borderVerts->push_back( osg::Vec3( -xb, +yo, 0.0f ) ); // v8
-		borderVerts->push_back( osg::Vec3( +xb, +yo, 0.0f ) ); // v21
-		borderVerts->push_back( osg::Vec3( +xb, +yi, 0.0f ) ); // v20
-		borderVerts->push_back( osg::Vec3( -xb, +yi, 0.0f ) ); // v9
+        // +y pillar cap
+        borderVerts->push_back( osg::Vec3( -xb, +yo, 0.0f ) ); // v8
+        borderVerts->push_back( osg::Vec3( +xb, +yo, 0.0f ) ); // v21
+        borderVerts->push_back( osg::Vec3( +xb, +yi, 0.0f ) ); // v20
+        borderVerts->push_back( osg::Vec3( -xb, +yi, 0.0f ) ); // v9
 
-		// -y pillar cap
-		borderVerts->push_back( osg::Vec3( -xb, -yi, 0.0f ) ); // v12
-		borderVerts->push_back( osg::Vec3( +xb, -yi, 0.0f ) ); // v17
-		borderVerts->push_back( osg::Vec3( +xb, -yo, 0.0f ) ); // v16
-		borderVerts->push_back( osg::Vec3( -xb, -yo, 0.0f ) ); // v13
+        // -y pillar cap
+        borderVerts->push_back( osg::Vec3( -xb, -yi, 0.0f ) ); // v12
+        borderVerts->push_back( osg::Vec3( +xb, -yi, 0.0f ) ); // v17
+        borderVerts->push_back( osg::Vec3( +xb, -yo, 0.0f ) ); // v16
+        borderVerts->push_back( osg::Vec3( -xb, -yo, 0.0f ) ); // v13
 
-		for ( int i = 0; i < 56; i++ )
-			borderDE->push_back( i );
-	}
+        for ( int i = 0; i < 56; i++ )
+            borderDE->push_back( i );
+    }
 }

@@ -15,28 +15,28 @@
 #include "defines.h"
 
 RenameDialog::RenameDialog()  :
-Fl_Dialog( "Rename", 250, 50, Fl_Dialog::Fl_OK | Fl_Dialog::Fl_CANCEL )
+    Fl_Dialog( "Rename", 250, 50, Fl_Dialog::Fl_OK | Fl_Dialog::Fl_CANCEL )
 {
-	begin();
+    begin();
 
-	nameLabel = new QuickLabel( "Name:", 5, 5 );
-	nameInput = new Fl_Input( 120, 5, 120, DEFAULT_TEXTSIZE + 6 );
-	
-	end();
+    nameLabel = new QuickLabel( "Name:", 5, 5 );
+    nameInput = new Fl_Input( 120, 5, 120, DEFAULT_TEXTSIZE + 6 );
 
-	cancelled = false;
+    end();
 
-	// add the callbacks
-	setOKEventHandler( OKCallback, this );
-	setCancelEventHandler( CancelCallback, this );
+    cancelled = false;
+
+    // add the callbacks
+    setOKEventHandler( OKCallback, this );
+    setCancelEventHandler( CancelCallback, this );
 }
 
 void RenameDialog::OKCallback_real( Fl_Widget* w ) {
-	cancelled = false;
-	hide();
+    cancelled = false;
+    hide();
 }
 
 void RenameDialog::CancelCallback_real( Fl_Widget* w ) {
-	cancelled = true;
-	hide();
+    cancelled = true;
+    hide();
 }
