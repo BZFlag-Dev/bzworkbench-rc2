@@ -122,6 +122,7 @@ void MainWindow::buildButtonPanel() {
 }
 
 // default constructor
+// This looks pointless FS: TODO remove
 MainWindow::MainWindow() : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench") 
 {
     printf("MainWindow::MainWindow()\n");
@@ -137,7 +138,8 @@ MainWindow::MainWindow() : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench
 }
 
 // construct from a model
-MainWindow::MainWindow(Model* m) : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench") {
+MainWindow::MainWindow(Model* m) : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZWorkbench") 
+{
     this->end();
     this->model = m;
 
@@ -146,6 +148,10 @@ MainWindow::MainWindow(Model* m) : Fl_Window(DEFAULT_WIDTH, DEFAULT_HEIGHT, "BZW
             RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT);
     this->view->end();
     this->add(view);
+
+    this->configurationMenu = new ConfigurationMenu(
+            this, MENU_X, MENU_Y, MENU_WIDTH, MENU_HEIGHT);
+    this->add(configurationMenu);
 
     // Add all the GUI Elements.
     this->menuBar = new MenuBar(this);
@@ -201,7 +207,7 @@ int MainWindow::handle(int event) {
 // configure an object
 void MainWindow::configure( bz2object* obj ) {
     configurationMenu->setObject(obj);
-    // configurationMenu->popup();
+    configurationMenu->popup();
 }
 
 // throw an error

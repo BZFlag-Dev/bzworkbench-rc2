@@ -24,7 +24,7 @@ alt left mouse button + motion      scale view
 
 Action                              Result
 -------------------------------     ----------------------------------
-3                                   Zoom into selected object (TD)
+3                                   Zoom to selected object (TD)
 5                                   Zoom/out into the map  (TD)
 6                                   View the map from the top (TD)
 7                                   View the map from the front (TD)
@@ -49,8 +49,9 @@ alt left mouse button + motion      scale view
 right mouse button                  configure an object (TD)
 c                                   configure an object (TD)
 s                                   switch to scale manipulator
-m                                   switch to move manipulator
-3                                   Zoom into selected object(s) (TD)
+m                                   switch to move/translate manipulator
+r                                   switch to rotate manipulator
+3                                   Zoom to selected object(s) (TD)
 
 
 ## Objects

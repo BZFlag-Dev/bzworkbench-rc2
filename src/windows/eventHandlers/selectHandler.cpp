@@ -76,6 +76,19 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
             }
             return false;
 
+        case(osgGA::GUIEventAdapter::KEYUP):
+            if (ea.getKey()=='c') {
+                viewer = dynamic_cast<View*>(&aa);
+                if(viewer) {
+                    printf("Configure\n");
+                    prevEvent = osgGA::GUIEventAdapter::PUSH;
+                    configureObject(viewer, ea);
+                } else {
+                    printf("No viewer!\n");
+                }
+            }
+            return true;
+
         case osgGA::GUIEventAdapter::RELEASE:
             translateSnap = osg::Vec3( 0, 0, 0 );
             scaleSnap = osg::Vec3( 0, 0, 0 );
@@ -87,7 +100,7 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
             {
                 bool result = false;
                 int button = ea.getButton();
-
+                printf("%d\n", button);
                 if(button == FL_LEFT_MOUSE) {
                     viewer = dynamic_cast<View*>(&aa);
                     if(viewer) {
@@ -139,7 +152,7 @@ bool selectHandler::pickObject(View* viewer, const osgGA::GUIEventAdapter& ea) {
     osgUtil::LineSegmentIntersector::Intersections intersections;
 
     // get the intersections from the point in the view where we clicked
-    if(viewer->computeIntersections( ea.getX(), ea.getY(), intersections ) ) {
+    if( viewer->computeIntersections( ea.getX(), ea.getY(), intersections ) ) {
         // iterate through the intersections
         for(osgUtil::LineSegmentIntersector::Intersections::iterator hitr = intersections.begin(); hitr != intersections.end(); ++hitr) {
 
@@ -187,7 +200,7 @@ bool selectHandler::pickSelector(View* viewer, const osgGA::GUIEventAdapter& ea)
     osgUtil::LineSegmentIntersector::Intersections intersections;
 
     // get the intersections from the point in the view where we clicked
-    if(viewer->computeIntersections( ea.getX(), ea.getY(), intersections ) ) {
+    if( viewer->computeIntersections( ea.getX(), ea.getY(), intersections ) ) {
         // iterate through the intersections
         for(osgUtil::LineSegmentIntersector::Intersections::iterator hitr = intersections.begin(); hitr != intersections.end(); ++hitr) {
 
@@ -239,13 +252,11 @@ bool selectHandler::configureObject(View* viewer, const osgGA::GUIEventAdapter& 
                 if(obj != NULL/* && obj->isSelected()*/) {
                     // tell the MainWindow to open up a configuration menu
                     MainWindow* mw = viewer->requestMainWindow();
-
                     if(mw) {
                         mw->configure( obj );
                         lastSelected = obj;
                         return true;
                     }
-
                     return false;
                 }
             }

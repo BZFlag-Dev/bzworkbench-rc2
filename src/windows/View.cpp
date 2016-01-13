@@ -126,10 +126,7 @@ void View::updateSelection(float newDistance) {
 void View::updateSelection() {
     // get the distance from the eyepoint to the center of the trackball
     float dist = this->cameraManipulatorRef->getDistance();
-//    printf("dist: %f\n", dist);
     this->updateSelection(dist);
-    // refresh
-    // redraw();
 }
 
 // handle events
@@ -148,9 +145,6 @@ int View::handle(int event) {
     selection->setStateByKey( e_key );
 
     result = RenderWindow::handle(event);
-    if (event == FL_DRAG) {
-    //    updateSelection();
-    }
 
     return result;
 }
