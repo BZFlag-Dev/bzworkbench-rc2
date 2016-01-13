@@ -1,6 +1,8 @@
 
 Bugs:
     - Crash on loading specific maps
+    - When (after resize?) loaidng a map the ground/grass is much smaller than
+      the map.
 
 Revive Existing currently broken Functionality
 

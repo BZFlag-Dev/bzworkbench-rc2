@@ -34,14 +34,10 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
     {
         // catch drag events
         case osgGA::GUIEventAdapter::DRAG :
-            printf("sh: drag %f %f\n", 
-                    (float) ea.getXnormalized(), (float) ea.getYnormalized());
             viewer = dynamic_cast<View*>(&aa);
             if(viewer != NULL) {
                 Renderable* lsobj = (Renderable*)lastSelected;
-                //printf("lsobj %p %s %s\n", lsobj, lsobj->getName().c_str(), Selection_NODE_NAME);
                 if(lsobj != NULL && !(lsobj->getName().compare(Selection_NODE_NAME))) {
-                    printf("Yup yup\n");
                     // if the last event was a DRAG event, we need to update
                     // the dx and dy
                     if( prevEvent == osgGA::GUIEventAdapter::DRAG ) {
@@ -53,7 +49,8 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                         dx = 0;
                         dy = 0;
                     }
-                    // set the prev_x and prev_y values so we can re-compute dx and dy on the next event
+                    // set the prev_x and prev_y values so we can re-compute
+                    // dx and dy on the next event
                     prev_x = ea.getXnormalized();
                     prev_y = ea.getYnormalized();
 
@@ -74,7 +71,7 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                             return dragSelector( view, ea );
                     }
                 } else {
-                    printf("Aauuw\n");
+                    // Do nothing
                 }
             }
             return false;
@@ -89,8 +86,6 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
         case osgGA::GUIEventAdapter::PUSH :
             {
                 bool result = false;
-
-                printf("sh: push\n");
                 int button = ea.getButton();
 
                 if(button == FL_LEFT_MOUSE) {
@@ -112,6 +107,7 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                 } else if(button == FL_RIGHT_MOUSE) {
                     viewer = dynamic_cast<View*>(&aa);
                     if(viewer) {
+                        printf("Configure\n");
                         prevEvent = osgGA::GUIEventAdapter::PUSH;
                         result = configureObject(viewer, ea);
                     } else {
@@ -120,15 +116,15 @@ bool selectHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAda
                 } else {
                     // Nothing
                 }
-                printf("sh: push result %d\n", result);
                 return result;
             }
         case osgGA::GUIEventAdapter::FRAME :
             // Generated every time a frame is drawn
-            printf("osgGA::GUIEventAdapter::FRAME\n");
+            // printf("osgGA::GUIEventAdapter::FRAME\n");
             return true;
         case osgGA::GUIEventAdapter::RESIZE :
-            printf("osgGA::GUIEventAdapter::RESIZE\n");
+            // TODO FS ??
+            // printf("osgGA::GUIEventAdapter::RESIZE\n");
             return true;
         default:
             // assume we handled everything
