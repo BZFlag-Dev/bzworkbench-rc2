@@ -19,115 +19,115 @@
 #include "defines.h"
 
 PhysicsEditor::PhysicsEditor( Model* model ) :
-		Fl_Dialog( "Physics Editor", 310, 200, Fl_Dialog::Fl_OK )
+    Fl_Dialog( "Physics Editor", 310, 200, Fl_Dialog::Fl_OK )
 {
-	this->model = model;
+    this->model = model;
 
-	begin();
+    begin();
 
-	// physics label
-	physicsLabel = new QuickLabel( "Physics: ", 5, 5 );
+    // physics label
+    physicsLabel = new QuickLabel( "Physics: ", 5, 5 );
 
-	// physics browser
-	physicsBrowser = new Fl_Multi_Browser( 5, 30, 225, 90 );
-	refreshPhysicsList();
+    // physics browser
+    physicsBrowser = new Fl_Multi_Browser( 5, 30, 225, 90 );
+    refreshPhysicsList();
 
-	// physics buttons
-	physicsAddButton = new Fl_Button( 235, 30, 70, DEFAULT_TEXTSIZE + 6, "Add" );
-	physicsAddButton->callback( PhysicsAddCallback, this );
-	physicsRemoveButton = new Fl_Button( 235, 55, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
-	physicsRemoveButton->callback( PhysicsRemoveCallback, this );
-	physicsEditButton = new Fl_Button( 235, 80, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
-	physicsEditButton->callback( PhysicsEditCallback, this );
+    // physics buttons
+    physicsAddButton = new Fl_Button( 235, 30, 70, DEFAULT_TEXTSIZE + 6, "Add" );
+    physicsAddButton->callback( PhysicsAddCallback, this );
+    physicsRemoveButton = new Fl_Button( 235, 55, 70, DEFAULT_TEXTSIZE + 6, "Remove" );
+    physicsRemoveButton->callback( PhysicsRemoveCallback, this );
+    physicsEditButton = new Fl_Button( 235, 80, 70, DEFAULT_TEXTSIZE + 6, "Edit" );
+    physicsEditButton->callback( PhysicsEditCallback, this );
 
 
-	end();
+    end();
 
-	// add the callbacks
-	setOKEventHandler( OKCallback, this );
+    // add the callbacks
+    setOKEventHandler( OKCallback, this );
 }
 
 void PhysicsEditor::refreshPhysicsList() {
-	physicsBrowser->clear();
+    physicsBrowser->clear();
 
-	std::map<string, osg::ref_ptr< physics > > phydrvs = model->_getPhysicsDrivers();
+    std::map<string, osg::ref_ptr< physics > > phydrvs = model->_getPhysicsDrivers();
 
-	std::map<string, osg::ref_ptr< physics > >::const_iterator i;
-	for ( i = phydrvs.begin(); i != phydrvs.end(); i++ ) {
-		physicsBrowser->add( i->first.c_str() );
-	}
+    std::map<string, osg::ref_ptr< physics > >::const_iterator i;
+    for ( i = phydrvs.begin(); i != phydrvs.end(); i++ ) {
+        physicsBrowser->add( i->first.c_str() );
+    }
 }
 
 // OK callback
 void PhysicsEditor::OKCallback_real( Fl_Widget* w ) {
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }
 
 void PhysicsEditor::PhysicsAddCallback_real( Fl_Widget* w ) {
-	// make a new material object
-	physics* newObj = dynamic_cast< physics* >( model->_buildObject( "physics" ) );
+    // make a new material object
+    physics* newObj = dynamic_cast< physics* >( model->_buildObject( "physics" ) );
 
-	if(!newObj)
-		return;
+    if(!newObj)
+        return;
 
-	model->_getPhysicsDrivers()[ newObj->getName() ] = newObj;
+    model->_getPhysicsDrivers()[ newObj->getName() ] = newObj;
 
-	// make sure the material shows up
-	refreshPhysicsList();
+    // make sure the material shows up
+    refreshPhysicsList();
 }
 
 void PhysicsEditor::PhysicsRemoveCallback_real( Fl_Widget* w ) {
-	const char* name = NULL;
-	for (int i = 1; i <= physicsBrowser->size(); i++) {
-		if ( physicsBrowser->selected( i ) ) {
-			name = physicsBrowser->text( i );
-			break;
-		}
-	}
+    const char* name = NULL;
+    for (int i = 1; i <= physicsBrowser->size(); i++) {
+        if ( physicsBrowser->selected( i ) ) {
+            name = physicsBrowser->text( i );
+            break;
+        }
+    }
 
-	if ( name == NULL )
-		return;
+    if ( name == NULL )
+        return;
 
-	map< string, osg::ref_ptr< physics > > phydrvs = model->_getPhysicsDrivers();
+    map< string, osg::ref_ptr< physics > > phydrvs = model->_getPhysicsDrivers();
 
-	if ( phydrvs.count( string( name ) ) ) {
-		physics* mat = phydrvs[ string( name ) ].get();
+    if ( phydrvs.count( string( name ) ) ) {
+        physics* mat = phydrvs[ string( name ) ].get();
 
-		model->_removePhysicsDriver( mat );
-	}
+        model->_removePhysicsDriver( mat );
+    }
 
-	refreshPhysicsList();
+    refreshPhysicsList();
 }
 
 void PhysicsEditor::PhysicsEditCallback_real( Fl_Widget* w ) {
-	// find the first selected item
-	const char* name = NULL;
-	for (int i = 1; i <= physicsBrowser->size(); i++) {
-		if ( physicsBrowser->selected( i ) ) {
-			name = physicsBrowser->text( i );
-			break;
-		}
-	}
+    // find the first selected item
+    const char* name = NULL;
+    for (int i = 1; i <= physicsBrowser->size(); i++) {
+        if ( physicsBrowser->selected( i ) ) {
+            name = physicsBrowser->text( i );
+            break;
+        }
+    }
 
-	// make sure something was actually selected
-	if ( name == NULL )
-		return;
+    // make sure something was actually selected
+    if ( name == NULL )
+        return;
 
-	// get the material
-	physics* mat = dynamic_cast< physics* >( model->_command( MODEL_GET, "phydrv", string( name ) ) );
+    // get the material
+    physics* mat = dynamic_cast< physics* >( model->_command( MODEL_GET, "phydrv", string( name ) ) );
 
-	if ( mat != NULL ) {
-		// open a material config dialog
-		PhysicsConfigurationDialog* pcd = new PhysicsConfigurationDialog( mat );
+    if ( mat != NULL ) {
+        // open a material config dialog
+        PhysicsConfigurationDialog* pcd = new PhysicsConfigurationDialog( mat );
 
-		pcd->show();
+        pcd->show();
 
-		while ( pcd->shown() ) { Fl::wait(); }
+        while ( pcd->shown() ) { Fl::wait(); }
 
-		// clean up
-		delete pcd;
-	}
+        // clean up
+        delete pcd;
+    }
 
-	refreshPhysicsList();
+    refreshPhysicsList();
 }

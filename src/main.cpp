@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef __APPLE__ 
 #include <sys/param.h>
@@ -87,103 +88,90 @@
 #include <osg/Group>
 
 
+#include <osgDB/ReadFile>
+
 // register the built-in objects
 void buildModelDatabase() {
-	Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
-	Model::registerObject("base", NULL, "end", base::init, BaseConfigurationDialog::init);
-	Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
-	Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
-	Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
-	Model::registerObject("group", NULL, "end", group::init, GroupConfigurationDialog::init);
-	Model::registerObject("link", NULL, "end", Tlink::init);
-	Model::registerObject("material", NULL, "end", material::init);
-	Model::registerObject("mesh", "<mesh:<face><drawinfo>><drawinfo:<lod>><lod:<matref>>", "end", mesh::init);
-	// need to do this for faces
-	Model::addTerminatorSupport("face", "endface");
+    Model::registerObject("arc", NULL, "end", arc::init, ArcConfigurationDialog::init);
+    Model::registerObject("base", NULL, "end", base::init, BaseConfigurationDialog::init);
+    Model::registerObject("box", NULL, "end", box::init, BoxConfigurationDialog::init);
+    Model::registerObject("cone", NULL, "end", cone::init, ConeConfigurationDialog::init);
+    Model::registerObject("dynamicColor", NULL, "end", dynamicColor::init);
+    Model::registerObject("group", NULL, "end", group::init, GroupConfigurationDialog::init);
+    Model::registerObject("link", NULL, "end", Tlink::init);
+    Model::registerObject("material", NULL, "end", material::init);
+    Model::registerObject("mesh", "<mesh:<face><drawinfo>><drawinfo:<lod>><lod:<matref>>", "end", mesh::init);
+    // need to do this for faces
+    Model::addTerminatorSupport("face", "endface");
 
-	Model::registerObject("meshbox", NULL, "end", box::init, BoxConfigurationDialog::init);
-	Model::registerObject("meshpyr", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
-	Model::registerObject("options", NULL, "end", options::init);
-	Model::registerObject("physics", NULL, "end", physics::init);
-	Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
-	Model::registerObject("sphere", NULL, "end", sphere::init, SphereConfigurationDialog::init);
-	Model::registerObject("teleporter", NULL, "end", teleporter::init, TeleporterConfigurationDialog::init);
-	Model::registerObject("tetra", NULL, "end", tetra::init);
-	Model::registerObject("texturematrix", NULL, "end", texturematrix::init);
-	Model::registerObject("waterLevel", NULL, "end", waterLevel::init);
-	Model::registerObject("weapon", NULL, "end", weapon::init, WeaponConfigurationDialog::init);
-	Model::registerObject("world", NULL, "end", world::init);
-	Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
-	Model::registerObject("info", NULL, "end", info::init);
+    Model::registerObject("meshbox", NULL, "end", box::init, BoxConfigurationDialog::init);
+    Model::registerObject("meshpyr", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
+    Model::registerObject("options", NULL, "end", options::init);
+    Model::registerObject("physics", NULL, "end", physics::init);
+    Model::registerObject("pyramid", NULL, "end", pyramid::init, PyramidConfigurationDialog::init);
+    Model::registerObject("sphere", NULL, "end", sphere::init, SphereConfigurationDialog::init);
+    Model::registerObject("teleporter", NULL, "end", teleporter::init, TeleporterConfigurationDialog::init);
+    Model::registerObject("tetra", NULL, "end", tetra::init);
+    Model::registerObject("texturematrix", NULL, "end", texturematrix::init);
+    Model::registerObject("waterLevel", NULL, "end", waterLevel::init);
+    Model::registerObject("weapon", NULL, "end", weapon::init, WeaponConfigurationDialog::init);
+    Model::registerObject("world", NULL, "end", world::init);
+    Model::registerObject("zone", NULL, "end", zone::init, ZoneConfigurationDialog::init);
+    Model::registerObject("info", NULL, "end", info::init);
 
-	Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
+    Model::registerObject("define", "<define:<arc><base><box><cone><group><mesh><meshbox><meshpyr><pyramid><sphere><teleporter><tetra>>", "enddef", define::init);
 }
+
+
+
+MainWindow* mw = 0;
+
+// Whenever nothing is happing, this will be called.
+void idle_callback(void*)
+{
+    if (mw != 0) {
+        // Only redraw the View, not all GUI elements.
+        // It will flicker a lot otherwise.
+        mw->getView()->redraw();
+    } else {
+        // DO Nothing
+    }
+    Fl::repeat_timeout(0.1, idle_callback);
+}
+
 
 int main(int argc, char** argv) {
-	
-	#ifdef __APPLE__ 
-	// set current working directory to be the parent directory of the bundled application
-	// only need to do this if built as a bundled application so we check the executable's path
-	size_t pathSize = MAXPATHLEN * 2;
-	char* rPath = (char*)malloc(pathSize);
-	char* execPath = (char*)malloc(pathSize);
-	int err = _NSGetExecutablePath(execPath, (uint32_t*)&pathSize );
-	if (err) {
-		puts("Application Path lookup failed!");
-	}else{
-		realpath(execPath, rPath);
-		printf("Application Path: %s\n", rPath);
-	}
-	
-	//FIXME - do not hard code app & executable names
-	string ibPath = "BzWorkbench.app/Contents/MacOS/BzWorkbench";
-	
-	if(strlen(rPath) > ibPath.length()){
-		string test = string(rPath).substr(string(rPath).length()-ibPath.length(), ibPath.length());
-		if( test.compare(ibPath) == 0 ){
-			// remove "bzworkbench.app/Contents/MacOS/bzworkbench"
-			std::string fixedPath = TextUtils::replace_all( rPath, ibPath, "");
-	
-			// set the current working directory
-			err = chdir((const char *)fixedPath.c_str());
-			// maybe we should bail out here if there is an error
-			if (err) puts("Changing Current Working Directory failed!");
-		}
-	}
-	
-	free(rPath);
-	free(execPath);
-	
-	#endif /* APPLE */
+    // init the model
+    Model* model = new Model();
 
-	// init the model
-	Model* model = new Model();
+    // add supported objects
+    buildModelDatabase();
 
-	// add supported objects
-	buildModelDatabase();
+    // initialize the BZWParser
+    BZWParser::init(model);
 
-	// initialize the BZWParser
-	BZWParser::init( model );
+    // init the SceneBuilder
+    SceneBuilder::init();
 
-	// init the SceneBuilder
-	SceneBuilder::init();
+    // load the main window
+    mw = new MainWindow(model);
+    mw->resizable(mw);
 
-	printf("model addr: %p\n", (void *)model);
+    printf("MainWindow: %p\n", mw);
+    printf("View: %p\n", mw->getView());
 
-	// load the main window
-	MainWindow* mw = new MainWindow(model);
-	mw->resizable(mw);
+    // show the main window
+    mw->show();
 
-	// show the main window
-	mw->show();
+    // TODO load any plugins
+    //    the_mainWindow = mw;
+    //    initPlugins();
 
-	// load any plugins
-	the_mainWindow = mw;
-	initPlugins();
-	
-	// load a default model
-	//bool success = BZWParser::loadFile( "./share/material_test.bzw" );
+    // TODO load a default model
+    //    bool success = BZWParser::loadFile( "./share/material_test.bzw" );
+    // run the program
 
-	// run the program
-	return Fl::run();
+    Fl::add_timeout(0.1, idle_callback);
+    return Fl::run();
 }
+

@@ -13,14 +13,13 @@
 #include "widgets/Fl_ImageButton.h"
 
 // constructor
-Fl_ImageButton::Fl_ImageButton( int x, int y, int width, int height, const char* imageFile ) :
-	Fl_Button( x, y, width, height ) {
-		
-	Fl_PNG_Image* tempImage = new Fl_PNG_Image( imageFile );
-	if( tempImage == NULL ) {
-		copy_label( imageFile );	
-	}
-	else {
-		image( tempImage );
-	}
+Fl_ImageButton::Fl_ImageButton( int x, int y, int width, int height, const char* imageFile ) : Fl_Button( x, y, width, height ) {
+
+    Fl_PNG_Image* tempImage = new Fl_PNG_Image( imageFile );
+    if( tempImage == NULL ) {
+        copy_label( imageFile );	
+    }
+    else {
+        image( tempImage );
+    }
 }

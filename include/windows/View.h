@@ -57,10 +57,10 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
 {
     public:
 
-    	// default zoom
-    	static const double DEFAULT_ZOOM;
+        // default zoom
+        static const double DEFAULT_ZOOM;
 
-    	// constructor
+        // constructor
         View(Model* m, MainWindow* mw, int x, int y, int w, int h, const char *label=0);
 
         // get the root node
@@ -79,7 +79,7 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
         void setUnselected( bz2object* object );
 
         // see if a renderable is contained
-       	bool contains( Renderable* node ) { return root->containsNode( node ); }
+        bool contains( Renderable* node ) { return root->containsNode( node ); }
 
         // select all objects
         // void selectAll();
@@ -109,80 +109,80 @@ class View : public osgViewer::Viewer, public RenderWindow, public Observer
         // get the selection reference
         Selection* getSelectionNode() { return selection; }
 
-		// get the selection handler
-		selectHandler* getSelectHandler() { return selHandler; }
+        // get the selection handler
+        selectHandler* getSelectHandler() { return selHandler; }
 
         // get the MainWindow parent, if possible
         MainWindow* requestMainWindow() { return mw; }
 
-		// update the selection based on the camera distance and redraw
-		void updateSelection();
+        // update the selection based on the camera distance and redraw
+        void updateSelection();
 
-		// snapping getters/setters
-		bool getSnappingEnabled() { return snappingEnabled; }
-		float getTranslateSnapSize() { return translateSnapSize; }
-		float getScaleSnapSize() { return scaleSnapSize; }
-		float getRotateSnapSize() { return rotateSnapSize; }
-		void setSnappingEnabled( bool value ) { snappingEnabled = value; }
-		void setTranslateSnapSize( float value ) { translateSnapSize = value; }
-		void setScaleSnapSize( float value ) { scaleSnapSize = value; }
-		void setRotateSnapSize( float value ) { rotateSnapSize = value; }
+        // snapping getters/setters
+        bool getSnappingEnabled() { return snappingEnabled; }
+        float getTranslateSnapSize() { return translateSnapSize; }
+        float getScaleSnapSize() { return scaleSnapSize; }
+        float getRotateSnapSize() { return rotateSnapSize; }
+        void setSnappingEnabled( bool value ) { snappingEnabled = value; }
+        void setTranslateSnapSize( float value ) { translateSnapSize = value; }
+        void setScaleSnapSize( float value ) { scaleSnapSize = value; }
+        void setRotateSnapSize( float value ) { rotateSnapSize = value; }
 
     protected:
 
-    	// draw method
+        // draw method
         virtual void draw();
 
-		// model reference
-		Model* model;
+        // model reference
+        Model* model;
 
-		// parent window reference
-		MainWindow* mw;
+        // parent window reference
+        MainWindow* mw;
 
-		// root node
-		osg::Group* root;
+        // root node
+        osg::Group* root;
 
-		// ground node
-		Renderable* ground;
+        // ground node
+        Renderable* ground;
 
-		// modifier key map.
-		// maps FLTK key values to bools
-		map< int, bool > modifiers;
+        // modifier key map.
+        // maps FLTK key values to bools
+        map< int, bool > modifiers;
 
-		// current event key
-		unsigned char e_key;
+        // current event key
+        unsigned char e_key;
 
-		// current event mouse button
-		unsigned int e_button;
+        // current event mouse button
+        unsigned int e_button;
 
-		// pointer to the trackball matrix manipulator
-		osg::ref_ptr< osgGA::TrackballManipulator > cameraManipulatorRef;
+        // pointer to the trackball matrix manipulator
+        osg::ref_ptr< osgGA::TrackballManipulator > cameraManipulatorRef;
 
-		// reference to select handler
-		selectHandler* selHandler;
+        // reference to select handler
+        selectHandler* selHandler;
 
-	private:
+    private:
 
-		// the collection of evnet handlers
-		EventHandlerCollection* eventHandlers;
+        // the collection of evnet handlers
+        EventHandlerCollection* eventHandlers;
 
-		// the current selection
-		Selection* selection;
+        // the current selection
+        Selection* selection;
 
-		// mouse button map (i.e. so we can adapt user input into input OSG expects)
-		map< unsigned int, unsigned int > mouseButtonMap;
+        // mouse button map (i.e. so we can adapt user input into input OSG expects)
+        map< unsigned int, unsigned int > mouseButtonMap;
 
-		// build the mouse button map
-		void buildMouseButtonMap();
+        // build the mouse button map
+        void buildMouseButtonMap();
 
-		// update the selection's axes
-		void updateSelection( float distance );
+        // update the selection's axes
+        void updateSelection( float distance );
 
-		// snap sizes
-		bool snappingEnabled;
-		float scaleSnapSize;
-		float translateSnapSize;
-		float rotateSnapSize;
+        // snap sizes
+        bool snappingEnabled;
+        float scaleSnapSize;
+        float translateSnapSize;
+        float rotateSnapSize;
 };
 
 

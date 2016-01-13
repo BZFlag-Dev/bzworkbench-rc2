@@ -14,37 +14,37 @@
 
 // default constructor
 options::options() : DataEntry("options", "") {
-	optionsString = string("");
+    optionsString = string("");
 }
 
 // get method
 string options::get(void) {
-	return toString();
+    return toString();
 }
 
 // bzw methods
 bool options::parse( std::string& line ) {
-	string key = BZWParser::key( line.c_str() );
-	string value = BZWParser::value( key.c_str(), line.c_str() );
-	
-	// check if we reached the end of the section
-	if ( key == "end" )
-		return false;
+    string key = BZWParser::key( line.c_str() );
+    string value = BZWParser::value( key.c_str(), line.c_str() );
 
-	// otherwise add to the optionsString
-	optionsString += line + " ";
+    // check if we reached the end of the section
+    if ( key == "end" )
+        return false;
 
-	return true;
+    // otherwise add to the optionsString
+    optionsString += line + " ";
+
+    return true;
 }
 
 void options::finalize() {
-	// nothing to do
+    // nothing to do
 }
 
 // toString method
 string options::toString(void) {
-	return string(string("options\n") +
-						"  " + optionsString + "\n" + 
-						getUnusedText() + 
-						"end\n");
+    return string(string("options\n") +
+            "  " + optionsString + "\n" + 
+            getUnusedText() + 
+            "end\n");
 }

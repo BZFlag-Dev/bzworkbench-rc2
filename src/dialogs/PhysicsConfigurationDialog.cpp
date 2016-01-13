@@ -13,56 +13,55 @@
 #include "dialogs/PhysicsConfigurationDialog.h"
 
 // constructor
-PhysicsConfigurationDialog::PhysicsConfigurationDialog( physics* _thePhysics ) :
-	ConfigurationDialog( _thePhysics, "Physics Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
-	begin();
+PhysicsConfigurationDialog::PhysicsConfigurationDialog( physics* _thePhysics ) : ConfigurationDialog( _thePhysics, "Physics Options", DEFAULT_WIDTH, DEFAULT_HEIGHT ) {
+    begin();
 
-	thePhysics = _thePhysics;
+    thePhysics = _thePhysics;
 
-	nameLabel = new QuickLabel( "Name:", 5, 5 );
-	nameInput = new Fl_Input( 60, 5, 235, DEFAULT_TEXTSIZE + 6 );
-	nameInput->value( thePhysics->getName().c_str() );
+    nameLabel = new QuickLabel( "Name:", 5, 5 );
+    nameInput = new Fl_Input( 60, 5, 235, DEFAULT_TEXTSIZE + 6 );
+    nameInput->value( thePhysics->getName().c_str() );
 
-	linearLabel = new QuickLabel( "Linear:", 5, 30 );
-	linearInput = new Point3DWidget( 60, 30 );
-	linearInput->setPoint3D( thePhysics->getLinear() );
+    linearLabel = new QuickLabel( "Linear:", 5, 30 );
+    linearInput = new Point3DWidget( 60, 30 );
+    linearInput->setPoint3D( thePhysics->getLinear() );
 
-	angularLabel = new QuickLabel( "Angular:", 5, 55 );
-	angularInput = new Point3DWidget( 60, 55 );
-	angularInput->setPoint3D( thePhysics->getAngular() );
+    angularLabel = new QuickLabel( "Angular:", 5, 55 );
+    angularInput = new Point3DWidget( 60, 55 );
+    angularInput->setPoint3D( thePhysics->getAngular() );
 
-	slideLabel = new QuickLabel( "Slide:", 5, 80 );
-	slideInput = new Fl_Value_Input( 60, 80, 235, DEFAULT_TEXTSIZE + 6 );
-	slideInput->value( thePhysics->getSlide() );
+    slideLabel = new QuickLabel( "Slide:", 5, 80 );
+    slideInput = new Fl_Value_Input( 60, 80, 235, DEFAULT_TEXTSIZE + 6 );
+    slideInput->value( thePhysics->getSlide() );
 
-	deathMessageLabel = new QuickLabel( "Death:", 5, 105 );
-	deathMessageInput = new Fl_Input( 60, 105, 235, DEFAULT_TEXTSIZE + 6 );
-	deathMessageInput->value( thePhysics->getDeathMessage().c_str() );
+    deathMessageLabel = new QuickLabel( "Death:", 5, 105 );
+    deathMessageInput = new Fl_Input( 60, 105, 235, DEFAULT_TEXTSIZE + 6 );
+    deathMessageInput->value( thePhysics->getDeathMessage().c_str() );
 
-	end();
+    end();
 
-	// add the callbacks
-	setOKEventHandler( OKCallback, this );
-	setCancelEventHandler( CancelCallback, this );
+    // add the callbacks
+    setOKEventHandler( OKCallback, this );
+    setCancelEventHandler( CancelCallback, this );
 
 }
 
 // OK callback
 void PhysicsConfigurationDialog::OKCallback_real( Fl_Widget* w ) {
-	// call cone-specific setters from the UI
-	thePhysics->setName( string( nameInput->value() ) );
-	thePhysics->setLinear( linearInput->getPoint3D() );
-	thePhysics->setAngular( angularInput->getPoint3D() );
-	thePhysics->setSlide( slideInput->value() );
-	thePhysics->setDeathMessage( string( deathMessageInput->value() ) );
+    // call cone-specific setters from the UI
+    thePhysics->setName( string( nameInput->value() ) );
+    thePhysics->setLinear( linearInput->getPoint3D() );
+    thePhysics->setAngular( angularInput->getPoint3D() );
+    thePhysics->setSlide( slideInput->value() );
+    thePhysics->setDeathMessage( string( deathMessageInput->value() ) );
 
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }
 
 // Cancel callback
 void PhysicsConfigurationDialog::CancelCallback_real( Fl_Widget* w ) {
-	// don't delete this dialog box just yet...just hide it
-	hide();
+    // don't delete this dialog box just yet...just hide it
+    hide();
 }
 

@@ -1,3 +1,20 @@
-Add features.
-Fix bugs.
-Improve the unix build system.
+
+Bugs:
+    - Crash on loading specific maps
+    - When (after resize?) loaidng a map the ground/grass is much smaller than
+      the map.
+
+Revive Existing currently broken Functionality
+
+Documentation:
+    - User Manual
+    - Design/Architecture
+
+Features:
+    - Button to reset the view
+    - Undo/Redo
+    - Shortcut to put an element on ground level
+    - Show the name of an object
+    - Improve the unix build system.
+    - Make it compile under Windows again.
+

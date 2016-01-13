@@ -15,25 +15,25 @@
 #include "defines.h"
 
 Point3DWidget::Point3DWidget( int x, int y ) : Fl_Group( x, y, 280, DEFAULT_TEXTSIZE + 6 ) {
-	xLabel = new QuickLabel( "X", x + 3, y );
-	xInput = new Fl_Value_Input( x + 15, y, 60, DEFAULT_TEXTSIZE + 6 );
+    xLabel = new QuickLabel( "X", x + 3, y );
+    xInput = new Fl_Value_Input( x + 15, y, 60, DEFAULT_TEXTSIZE + 6 );
 
-	yLabel = new QuickLabel( "Y", x + 78, y );
-	yInput = new Fl_Value_Input( x + 90, y, 60, DEFAULT_TEXTSIZE + 6 );
+    yLabel = new QuickLabel( "Y", x + 78, y );
+    yInput = new Fl_Value_Input( x + 90, y, 60, DEFAULT_TEXTSIZE + 6 );
 
-	zLabel = new QuickLabel( "Z", x + 153, y );
-	zInput = new Fl_Value_Input( x + 165, y, 60, DEFAULT_TEXTSIZE + 6 );
+    zLabel = new QuickLabel( "Z", x + 153, y );
+    zInput = new Fl_Value_Input( x + 165, y, 60, DEFAULT_TEXTSIZE + 6 );
 
-	end();
+    end();
 }
 
 Point3D Point3DWidget::getPoint3D() {
-	return Point3D( xInput->value(), yInput->value(), zInput->value() );
+    return Point3D( xInput->value(), yInput->value(), zInput->value() );
 }
 
 void Point3DWidget::setPoint3D( Point3D value ) {
-	xInput->value( value.x() );
-	yInput->value( value.y() );
-	zInput->value( value.z() );
+    xInput->value( value.x() );
+    yInput->value( value.y() );
+    zInput->value( value.z() );
 }
 
